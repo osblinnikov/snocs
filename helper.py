@@ -8,7 +8,7 @@ join = os.path.join
 
 # Prepends the full path information to the output directory so that the build
 # files are dropped into the directory specified by trgt rather than in the 
-# same directory as the SConscript file.
+# same directory as the SNocscript file.
 # 
 # Parameters:
 #	 env	 - The environment to assign the Program value for
@@ -16,7 +16,7 @@ join = os.path.join
 #	 trgt	- The target application name (without extension)
 #	 srcs	- The list of source files
 # Ref:
-#	 Credit grieve and his local SCons guru for this: 
+#	 Credit grieve and his local SNocs guru for this: 
 #	 http://stackoverflow.com/questions/279860/how-do-i-get-projects-to-place-their-build-output-into-the-same-directory-with
 def cogging(files, CLEANING_STAGE):
 	# cleaning_arg = '-U' #-u means unix style ending

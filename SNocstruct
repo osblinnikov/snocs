@@ -26,18 +26,18 @@ env.AppendENVPath('PKG_CONFIG_PATH', os.path.join(args['INSTALL_PATH'],'lib','pk
                 
 # Progress('Evaluating $TARGET\n')
 env.Decider( 'MD5-timestamp' )          # For speed, use timestamps for change, followed by MD5
-# Export this environment for use by the SConscript files
+# Export this environment for use by the SNocscript files
 Export( 'env', 'args' )
 
 #--------------------------------------
 #           SOLUTION Builders
 #--------------------------------------
-args['SCONSCRIPT_PATH'] = os.path.abspath(os.path.dirname(args['SCONSCRIPT']))
+args['SNOCSCRIPT_PATH'] = os.path.abspath(os.path.dirname(args['SNOCSCRIPT']))
 preparePaths(env,args)
                 
 #start main build
-print args['SCONSCRIPT']
-SConscript( args['SCONSCRIPT'] )
+print args['SNOCSCRIPT']
+SConscript( args['SNOCSCRIPT'] )
 if args['ONLY_PROJECT_CLEANING_STAGE'] == '0':
     #Include crossproject dependencies
     dictLaunchedDependencies = {}
@@ -48,12 +48,12 @@ if args['ONLY_PROJECT_CLEANING_STAGE'] == '0':
             for depFullPath in args['CROSSPROJECT_DEPENDENCIES']:
                 if depFullPath not in dictLaunchedDependencies:
                     foundNewDependency = 1
-                    args['SCONSCRIPT'] = os.path.join(depFullPath,'SNocscript.py')
-                    args['SCONSCRIPT_PATH'] = os.path.abspath(os.path.dirname(args['SCONSCRIPT']))
+                    args['SNOCSCRIPT'] = os.path.join(depFullPath,'SNocscript.py')
+                    args['SNOCSCRIPT_PATH'] = os.path.abspath(os.path.dirname(args['SNOCSCRIPT']))
                     preparePaths(env,args)
                     #start building dependency
-                    # print args['SCONSCRIPT']
-                    SConscript(args['SCONSCRIPT'])
+                    # print args['SNOCSCRIPT']
+                    SConscript(args['SNOCSCRIPT'])
                     dictLaunchedDependencies[depFullPath] = 1
                     break
     #--------------------------------------

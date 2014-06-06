@@ -1,0 +1,5 @@
+*.pyc
+*.dblite
+Release
+Debug
+*.tmp

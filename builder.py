@@ -6,7 +6,7 @@ from default import *
 from vc9 import *
 
 #PLEASE change it if you don't want the standard snocs location
-PROJECTS_ROOT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),'..','..','..','..','..','..'))
+PROJECTS_ROOT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),'..','..','..','..'))
 
 def prepare_args(ARGUMENTS):
     #--------command line arguments------------
