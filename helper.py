@@ -42,6 +42,8 @@ def DefaultParentConfig(c,env,args):
 		c['inclDepsStatic'](env,args)
 
 def DefaultLibraryConfig(c, env, args):
+	if not c.has_key("paths"):
+		c['paths'] = []
 	curDir = args['SNOCSCRIPT_PATH']
 	if args['NO_DYNAMIC_BUILD'] != '1':
 		args['ADD_STATIC_DEPENDENCIES'] = 0
@@ -50,7 +52,7 @@ def DefaultLibraryConfig(c, env, args):
 		args['PROG_NAME'] = c['PROG_NAME']
 		args['prj_env'] = env.Clone()
 		args['prj_env'].Append(
-			CPPPATH = [join(curDir,'include')],
+			CPPPATH = c['paths']+[join(curDir,'include')],
 			CPPDEFINES = c['defines']+[c['PROG_NAME']+"_EXPORT"]
 		)
 
@@ -60,7 +62,7 @@ def DefaultLibraryConfig(c, env, args):
 		#			 SHARED TESTS
 		args['PROG_NAME'] = c['PROG_NAME'] + "_test"
 		args['prj_env'] = env.Clone()
-		args['prj_env'].Append( CPPPATH = [ join(curDir,'include') ] )
+		args['prj_env'].Append( CPPPATH = c['paths']+[ join(curDir,'include') ] )
 		AddDependency(args, c['PROG_NAME'], curDir)
 		
 		if c.get('inclDepsDynamic_tests')!=None:
@@ -73,7 +75,7 @@ def DefaultLibraryConfig(c, env, args):
 			#			 SHARED RUN
 			args['PROG_NAME'] = c['PROG_NAME'] + "_run"
 			args['prj_env'] = env.Clone()
-			args['prj_env'].Append( CPPPATH = [ join(curDir,'include') ] )
+			args['prj_env'].Append( CPPPATH = c['paths']+[ join(curDir,'include') ] )
 			AddDependency(args, c['PROG_NAME'], curDir)
 			
 			if c.get('inclDepsDynamic_run')!=None:
@@ -88,7 +90,7 @@ def DefaultLibraryConfig(c, env, args):
 		args['PROG_NAME'] = c['PROG_NAME'] + "_static"
 		args['prj_env'] = env.Clone()
 		args['prj_env'].Append( 
-			CPPPATH = [join(curDir,'include')],
+			CPPPATH = c['paths']+[join(curDir,'include')],
 			CPPDEFINES = c['defines']+[c['PROG_NAME']+"_STATIC"]
 		)
 		c['inclDepsStatic'](env, args)
@@ -98,7 +100,7 @@ def DefaultLibraryConfig(c, env, args):
 		args['PROG_NAME'] = c['PROG_NAME'] + "_static_test"
 		args['prj_env'] = env.Clone()
 		args['prj_env'].Append(
-			CPPPATH = [ join(curDir,'include') ],
+			CPPPATH = c['paths']+[ join(curDir,'include') ],
 			CPPDEFINES = c['defines']+[c['PROG_NAME']+"_STATIC"]
 		)
 		AddDependency(args, c['PROG_NAME'], curDir)
@@ -113,7 +115,7 @@ def DefaultLibraryConfig(c, env, args):
 			args['PROG_NAME'] = c['PROG_NAME'] + "_static_run"
 			args['prj_env'] = env.Clone()
 			args['prj_env'].Append(
-				CPPPATH = [ join(curDir,'include') ],
+				CPPPATH = c['paths']+[ join(curDir,'include') ],
 				CPPDEFINES = c['defines']+[c['PROG_NAME']+"_STATIC"]
 			)
 			AddDependency(args, c['PROG_NAME'], curDir)
