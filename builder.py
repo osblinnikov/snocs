@@ -122,7 +122,7 @@ def printHelp():
     print "  snocs example compiler=vc9 test"
     print "**********************"
     print "Available options:"
-    print "  compiler={gcc,mingw,vc9,vc10,vc11,vc11exp}"
+    print "  compiler={gcc,gpp,gppqt5,mingw,vc9,vc10,vc11,vc11exp}"
     print "  configuration={Debug,Release}"
     print "  platform={x86,Win32,x64} # Win32 is an alias to x86"
     print "  verbose=1 # enables scons debug output"
