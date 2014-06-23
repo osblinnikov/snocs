@@ -317,6 +317,6 @@ def AddOpenGL(env,args):
 		print "OpenGL for mingw is not implemented yet in snocs"
 	else:
 		args['prj_env'].Append(
-			LIBS = ['GL','GLU'],
+			LIBS = ['GL'],
 			# LINKFLAGS = ['-GL']
 		)
