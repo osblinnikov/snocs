@@ -293,8 +293,20 @@ def AddPthreads(env, args):
 			# LIBS = ['pthread'],
 			LINKFLAGS = ['-pthread']
 		)
+
 def AddNetwork(args):
 	if args['MSVC_VERSION'] != None:
 		args['prj_env'].Append(LIBS = ['WSock32'])
 	elif args['COMPILER_CODE'] == 'mingw':
 		args['prj_env'].Append(LIBS = ['ws2_32', 'IPHLPAPI'])
+
+def AddOpenGL(env,args):
+	if args['MSVC_VERSION'] != None:
+		print "OpenGL for MSVC is not implemented yet in snocs"
+	elif args['COMPILER_CODE'] == 'mingw':
+		print "OpenGL for mingw is not implemented yet in snocs"
+	else:
+		args['prj_env'].Append(
+			LIBS = ['GL','GLU'],
+			# LINKFLAGS = ['-GL']
+		)

@@ -12,13 +12,11 @@ def get_immediate_subdirectories(dir):
 def detectLatestQtDir(arch):
     if arch == 'x86':
         if sys.platform.startswith("linux"):
-            print os.path.expanduser("~/Qt-x86/5.3/gcc")
             return os.environ.get("QTDIR",os.path.expanduser("~/Qt-x86/5.3/gcc"))
         else:
             return os.environ.get("QTDIR","C:\\Qt\\5.3\\mingw")
     elif arch == 'x64':
         if sys.platform.startswith("linux"):
-            print os.path.expanduser("~/Qt/5.3/gcc_64")
             return os.environ.get("QTDIR",os.path.expanduser("~/Qt/5.3/gcc_64"))
         else:
             return os.environ.get("QTDIR","C:\\Qt\\5.3\\mingw")
