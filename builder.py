@@ -1,6 +1,7 @@
 import os.path
 import sys
-from gccpp import *
+from gppqt5 import *
+from gpp import *
 from gcc import *
 from mingw import *
 from default import *
@@ -67,8 +68,10 @@ def prepare_args(ARGUMENTS):
     if args['COMPILER_CODE'] == 'default':
         print "WARNING: compiler was not specified, using default parameters"
         args = prepare_default(args)
-    elif args['COMPILER_CODE'] == 'gccpp':
-        args = prepare_gccpp(args)        
+    elif args['COMPILER_CODE'] == 'gppqt5':
+        args = prepare_gppqt5(args)       
+    elif args['COMPILER_CODE'] == 'gpp':
+        args = prepare_gpp(args)        
     elif args['COMPILER_CODE'] == 'gcc':
         args = prepare_gcc(args)
     elif args['COMPILER_CODE'] == 'mingw':

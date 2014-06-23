@@ -2,7 +2,7 @@ import os.path
 import sys
 import string
 
-def prepare_gccpp(args):
+def prepare_gpp(args):
     args['TOOLS'] = ['default', 'gcc']
     args['CPPPATH'].extend([])
     args['CPPDEFINES'].extend([])

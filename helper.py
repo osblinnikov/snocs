@@ -41,6 +41,12 @@ def DefaultParentConfig(c,env,args):
 		args['ADD_STATIC_DEPENDENCIES'] = 1
 		c['inclDepsStatic'](env,args)
 
+def enableQtModules(c,env,args):
+	if c.has_key('qt5modules') and args['QT_DIR_NAME']=='QT5DIR':
+		env.EnableQt5Modules(c['qt5modules'])
+	if c.has_key('qt4modules') and args['QT_DIR_NAME']=='QT4DIR':
+		env.EnableQt4Modules(c['qt4modules'])
+
 def DefaultLibraryConfig(c, env, args):
 	if not c.has_key("paths"):
 		c['paths'] = []
@@ -51,6 +57,7 @@ def DefaultLibraryConfig(c, env, args):
 		#			SHARED
 		args['PROG_NAME'] = c['PROG_NAME']
 		args['prj_env'] = env.Clone()
+		enableQtModules(c,args['prj_env'],args)
 		args['prj_env'].Append(
 			CPPPATH = c['paths']+[join(curDir,'include')],
 			CPPDEFINES = c['defines']+[c['PROG_NAME']+"_EXPORT"]
@@ -62,6 +69,7 @@ def DefaultLibraryConfig(c, env, args):
 		#			 SHARED TESTS
 		args['PROG_NAME'] = c['PROG_NAME'] + "_test"
 		args['prj_env'] = env.Clone()
+		enableQtModules(c,args['prj_env'],args)
 		args['prj_env'].Append( CPPPATH = c['paths']+[ join(curDir,'include') ] )
 		AddDependency(args, c['PROG_NAME'], curDir)
 		
@@ -75,6 +83,7 @@ def DefaultLibraryConfig(c, env, args):
 			#			 SHARED RUN
 			args['PROG_NAME'] = c['PROG_NAME'] + "_run"
 			args['prj_env'] = env.Clone()
+			enableQtModules(c,args['prj_env'],args)
 			args['prj_env'].Append( CPPPATH = c['paths']+[ join(curDir,'include') ] )
 			AddDependency(args, c['PROG_NAME'], curDir)
 			
@@ -89,6 +98,7 @@ def DefaultLibraryConfig(c, env, args):
 		#			STATIC
 		args['PROG_NAME'] = c['PROG_NAME'] + "_static"
 		args['prj_env'] = env.Clone()
+		enableQtModules(c,args['prj_env'],args)
 		args['prj_env'].Append( 
 			CPPPATH = c['paths']+[join(curDir,'include')],
 			CPPDEFINES = c['defines']+[c['PROG_NAME']+"_STATIC"]
@@ -99,6 +109,7 @@ def DefaultLibraryConfig(c, env, args):
 		#			 STATIC TESTS
 		args['PROG_NAME'] = c['PROG_NAME'] + "_static_test"
 		args['prj_env'] = env.Clone()
+		enableQtModules(c,args['prj_env'],args)
 		args['prj_env'].Append(
 			CPPPATH = c['paths']+[ join(curDir,'include') ],
 			CPPDEFINES = c['defines']+[c['PROG_NAME']+"_STATIC"]
@@ -114,6 +125,7 @@ def DefaultLibraryConfig(c, env, args):
 			#			 SHARED RUN
 			args['PROG_NAME'] = c['PROG_NAME'] + "_static_run"
 			args['prj_env'] = env.Clone()
+			enableQtModules(c,args['prj_env'],args)
 			args['prj_env'].Append(
 				CPPPATH = c['paths']+[ join(curDir,'include') ],
 				CPPDEFINES = c['defines']+[c['PROG_NAME']+"_STATIC"]

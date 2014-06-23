@@ -20,9 +20,15 @@ env = Environment(
     LINKCOMSTR = args['LINKCOMSTR'],
     ENV = os.environ
 )
+
 env.AppendENVPath('LD_LIBRARY_PATH', os.path.join(args['INSTALL_PATH'],'lib'))
 env.AppendENVPath('PATH', os.path.join(args['INSTALL_PATH'],'lib'))
 env.AppendENVPath('PKG_CONFIG_PATH', os.path.join(args['INSTALL_PATH'],'lib','pkgconfig'))
+
+if args.has_key('QT_DIR_NAME'):
+    env[args['QT_DIR_NAME']] = args['QT_DIR']
+    env.AppendENVPath('PKG_CONFIG_PATH', args['QT_PKG_CONFIG_PATH'])
+    env.Tool(args['QT_TOOL'])
                 
 # Progress('Evaluating $TARGET\n')
 env.Decider( 'MD5-timestamp' )          # For speed, use timestamps for change, followed by MD5
