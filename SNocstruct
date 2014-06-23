@@ -13,6 +13,7 @@ env = Environment(
     LIBPATH = args['LIBPATH'],
     LIBS = args['LIBS'],
     LINKFLAGS = args['LINKFLAGS'],
+    CC=args['CC'],
     CPPPATH = args['CPPPATH'],
     CPPDEFINES = args['CPPDEFINES'],
     CCFLAGS = args['CCFLAGS'],

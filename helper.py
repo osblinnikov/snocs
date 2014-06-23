@@ -41,11 +41,19 @@ def DefaultParentConfig(c,env,args):
 		args['ADD_STATIC_DEPENDENCIES'] = 1
 		c['inclDepsStatic'](env,args)
 
-def enableQtModules(c,env,args):
+def enableQtModules(c,env,args,isUiBuildEnabled):
+	qtui = []
+	if isUiBuildEnabled and c.has_key('qtui'):
+		qtui = PrefixSources(args, 'src', c['qtui'])
+		
 	if c.has_key('qt5modules') and args['QT_DIR_NAME']=='QT5DIR':
 		env.EnableQt5Modules(c['qt5modules'])
+		if len(qtui)>0:
+			env.Uic5(qtui[0])
 	if c.has_key('qt4modules') and args['QT_DIR_NAME']=='QT4DIR':
 		env.EnableQt4Modules(c['qt4modules'])
+		if len(qtui)>0:
+			env.Uic4(qtui)
 
 def DefaultLibraryConfig(c, env, args):
 	if not c.has_key("paths"):
@@ -57,40 +65,41 @@ def DefaultLibraryConfig(c, env, args):
 		#			SHARED
 		args['PROG_NAME'] = c['PROG_NAME']
 		args['prj_env'] = env.Clone()
-		enableQtModules(c,args['prj_env'],args)
+		
 		args['prj_env'].Append(
 			CPPPATH = c['paths']+[join(curDir,'include')],
 			CPPDEFINES = c['defines']+[c['PROG_NAME']+"_EXPORT"]
 		)
 
 		c['inclDepsDynamic'](env, args)
+		enableQtModules(c,args['prj_env'],args,True)
 		env.Default(PrefixSharedLibrary(args, 'src', c['sourceFiles']))
 
 		#			 SHARED TESTS
 		args['PROG_NAME'] = c['PROG_NAME'] + "_test"
 		args['prj_env'] = env.Clone()
-		enableQtModules(c,args['prj_env'],args)
+		
 		args['prj_env'].Append( CPPPATH = c['paths']+[ join(curDir,'include') ] )
 		AddDependency(args, c['PROG_NAME'], curDir)
 		
 		if c.get('inclDepsDynamic_tests')!=None:
 			c['inclDepsDynamic_tests'](env, args)
 		c['inclDepsDynamic'](env, args)
-
+		enableQtModules(c,args['prj_env'],args,False)
 		env.Default(PrefixTest(args, 'tests', c['testFiles']))
 
 		if c.has_key('runFiles'):
 			#			 SHARED RUN
 			args['PROG_NAME'] = c['PROG_NAME'] + "_run"
 			args['prj_env'] = env.Clone()
-			enableQtModules(c,args['prj_env'],args)
+			
 			args['prj_env'].Append( CPPPATH = c['paths']+[ join(curDir,'include') ] )
 			AddDependency(args, c['PROG_NAME'], curDir)
 			
 			if c.get('inclDepsDynamic_run')!=None:
 				c['inclDepsDynamic_run'](env, args)
 			c['inclDepsDynamic'](env, args)
-
+			enableQtModules(c,args['prj_env'],args,False)
 			env.Default(PrefixProgram(args, 'src', c['runFiles']))
 
 	if args['NO_STATIC_BUILD'] != '1':
@@ -98,18 +107,19 @@ def DefaultLibraryConfig(c, env, args):
 		#			STATIC
 		args['PROG_NAME'] = c['PROG_NAME'] + "_static"
 		args['prj_env'] = env.Clone()
-		enableQtModules(c,args['prj_env'],args)
+		
 		args['prj_env'].Append( 
 			CPPPATH = c['paths']+[join(curDir,'include')],
 			CPPDEFINES = c['defines']+[c['PROG_NAME']+"_STATIC"]
 		)
 		c['inclDepsStatic'](env, args)
+		enableQtModules(c,args['prj_env'],args,True)
 		env.Default(PrefixLibrary(args, 'src', c['sourceFiles']))
 
 		#			 STATIC TESTS
 		args['PROG_NAME'] = c['PROG_NAME'] + "_static_test"
 		args['prj_env'] = env.Clone()
-		enableQtModules(c,args['prj_env'],args)
+		enableQtModules(c,args['prj_env'],args,False)
 		args['prj_env'].Append(
 			CPPPATH = c['paths']+[ join(curDir,'include') ],
 			CPPDEFINES = c['defines']+[c['PROG_NAME']+"_STATIC"]
@@ -125,7 +135,7 @@ def DefaultLibraryConfig(c, env, args):
 			#			 SHARED RUN
 			args['PROG_NAME'] = c['PROG_NAME'] + "_static_run"
 			args['prj_env'] = env.Clone()
-			enableQtModules(c,args['prj_env'],args)
+			
 			args['prj_env'].Append(
 				CPPPATH = c['paths']+[ join(curDir,'include') ],
 				CPPDEFINES = c['defines']+[c['PROG_NAME']+"_STATIC"]
@@ -135,7 +145,7 @@ def DefaultLibraryConfig(c, env, args):
 			if c.get('inclDepsDynamic_run')!=None:
 				c['inclDepsDynamic_run'](env, args)
 			c['inclDepsDynamic'](env, args)
-
+			enableQtModules(c,args['prj_env'],args,False)
 			env.Default(PrefixProgram(args, 'src', c['runFiles']))
 
 def PrefixProgram(args, folder, srcs):

@@ -23,6 +23,7 @@ def detectLatestQtDir(arch):
 
 def prepare_gppqt5(args):
     args['TOOLS'] = ['default']
+    args['CC'] = 'g++'
     args['QT_TOOL'] = 'qt5'
     args['QT_DIR_NAME'] = 'QT5DIR'
     args['QT_DIR'] = detectLatestQtDir(args['TARGET_ARCH'])
