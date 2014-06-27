@@ -20,7 +20,7 @@ def prepare_args(ARGUMENTS):
     else:
         args['NO_DYNAMIC_BUILD'] = '0'
         args['NO_STATIC_BUILD'] = '1'
-    args['CC'] = None
+    # args['CC'] = None
     args['CLEANING_STAGE'] = ARGUMENTS.get('cleaning_all', '0')
     args['ONLY_PROJECT_CLEANING_STAGE'] = ARGUMENTS.get('cleaning_one', '0')
     args['TESTNORUN'] = ARGUMENTS.get('testnorun', '0')

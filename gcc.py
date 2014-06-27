@@ -3,6 +3,7 @@ import sys
 import string
 
 def prepare_gcc(args):
+    args['CC'] = 'gcc'
     args['TOOLS'] = ['default', 'gcc']
     args['CPPPATH'].extend([])
     args['CPPDEFINES'].extend([])

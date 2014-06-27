@@ -13,7 +13,7 @@ env = Environment(
     LIBPATH = args['LIBPATH'],
     LIBS = args['LIBS'],
     LINKFLAGS = args['LINKFLAGS'],
-    CC=args['CC'],
+    # CC=args['CC'],
     CPPPATH = args['CPPPATH'],
     CPPDEFINES = args['CPPDEFINES'],
     CCFLAGS = args['CCFLAGS'],
@@ -21,6 +21,9 @@ env = Environment(
     LINKCOMSTR = args['LINKCOMSTR'],
     ENV = os.environ
 )
+
+if args.has_key('CC') and args['CC'] != None:
+    env.Replace(CC=args['CC'])
 
 env.AppendENVPath('LD_LIBRARY_PATH', os.path.join(args['INSTALL_PATH'],'lib'))
 env.AppendENVPath('PATH', os.path.join(args['INSTALL_PATH'],'lib'))
@@ -72,6 +75,6 @@ if args['ONLY_PROJECT_CLEANING_STAGE'] == '0':
             if args['APP_BUILD'].has_key(prog) and args['APP_BUILD'].has_key(dep):
                 Requires(args['APP_BUILD'][prog], args['APP_BUILD'][dep])
 
-Alias('test', args['TEST_ALIASES'])#run env.Install when install command provided in command line
 args['INSTALL_ALIASES'].append( args['TEST_ALIASES'] )
-Alias('install', args['INSTALL_ALIASES'])#run env.Install when install command provided in command line
+Alias('test', args['INSTALL_ALIASES'])#run when test command provided in command line
+Alias('install', args['INSTALL_ALIASES'])#run when install command provided in command line
