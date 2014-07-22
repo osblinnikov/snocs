@@ -21,7 +21,7 @@ Test that all is well:
 
     snocs example compiler=gcc test
 
-Enjoy your crossplatform usage of the SNocs!
+Enjoy your crossplatform usage of SNocs!
 
 Usage
 ---
