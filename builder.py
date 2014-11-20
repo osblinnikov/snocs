@@ -33,7 +33,7 @@ def prepare_args(ARGUMENTS):
         args['configuration'] = 'Debug'
     if args['configuration'] != 'Debug':
         args['configuration'] = 'Release'
-    args['COMPILER_CODE'] = ARGUMENTS.get('compiler', 'default').lower()
+    args['COMPILER_CODE'] = ARGUMENTS.get('compiler', 'gcc').lower()
     args['TARGET_ARCH'] = ARGUMENTS.get('platform', 'x86').lower()
     if args['TARGET_ARCH'] == 'Win32':
         args['TARGET_ARCH'] = 'x86'

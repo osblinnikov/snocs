@@ -76,5 +76,5 @@ if args['ONLY_PROJECT_CLEANING_STAGE'] == '0':
                 Requires(args['APP_BUILD'][prog], args['APP_BUILD'][dep])
 
 args['INSTALL_ALIASES'].append( args['TEST_ALIASES'] )
-Alias('test', args['INSTALL_ALIASES'])#run when test command provided in command line
+Alias('test', args['TEST_ALIASES'])#run when test command provided in command line
 Alias('install', args['INSTALL_ALIASES'])#run when install command provided in command line
