@@ -149,8 +149,9 @@ def DefaultLibraryConfig(c, env, args):
 			env.Default(PrefixProgram(args, 'src', c['runFiles']))
 
 def PrefixProgram(args, folder, srcs):
-	print "_------------Program-------------_"
 	trgt = args['PROG_NAME']
+	print trgt
+	
 	folder_trgt = os.path.join(folder, trgt+'.tmp')
 	args['prj_env'].VariantDir(folder_trgt, folder, duplicate=0)
 	#------------	COG	-------------------
