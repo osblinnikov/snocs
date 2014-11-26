@@ -258,7 +258,7 @@ def AddDependencyConfig(args, dep, deppath):
 
 def AddDependency(args, dep, deppath):
 	if args['ADD_STATIC_DEPENDENCIES'] == 1:
-		dep = dep + '_static'
+		dep = dep + '_STATIC'
 	deppath = os.path.abspath(deppath)
 	AddOrdering(args,dep,deppath)
 	AddDependencyConfig(args,dep, deppath)
