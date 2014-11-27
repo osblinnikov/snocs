@@ -304,7 +304,7 @@ def AddPthreads(env, args):
 			LIBPATH = [os.path.join(PATH_TO_PTHREADS_WIN,'lib',args['TARGET_ARCH'])]
 		)
 		env.AppendENVPath('PATH', os.path.join(PATH_TO_PTHREADS_WIN,'dll',args['TARGET_ARCH']))
-	else:
+	elif not args.has_key('LINK'):
 		args['prj_env'].Append(
 			# LIBS = ['pthread'],
 			LINKFLAGS = ['-pthread']
