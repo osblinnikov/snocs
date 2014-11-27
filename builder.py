@@ -98,7 +98,6 @@ def prepare_args(ARGUMENTS):
         args['LINKFLAGS'] = args['LINKFLAGS'].extend(ARGUMENTS.get('LINKFLAGS', '').split(';'))
         args['LIBPATH'] = args['LIBPATH'].extend(ARGUMENTS.get('LIBPATH', '').split(';'))
         args['LIBS'] = args['LIBS'].extend(ARGUMENTS.get('LIBS', '').split(';'))
-        args['ARCHITECTURE_CODE'] = '_'+args['COMPILER_CODE']
         print "compiler: "+args['CC']
         print "linker: "+args['LINK']
     return args
