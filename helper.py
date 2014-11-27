@@ -110,7 +110,7 @@ def DefaultLibraryConfig(c, env, args):
 		
 		args['prj_env'].Append( 
 			CPPPATH = c['paths']+[join(curDir,'include')],
-			CPPDEFINES = c['defines']+[c['PROG_NAME']+"_STATIC"]
+			CPPDEFINES = c['defines']+[(c['PROG_NAME']+"_static").upper()]
 		)
 		c['inclDepsStatic'](env, args)
 		enableQtModules(c,args['prj_env'],args,True)
@@ -122,7 +122,7 @@ def DefaultLibraryConfig(c, env, args):
 		enableQtModules(c,args['prj_env'],args,False)
 		args['prj_env'].Append(
 			CPPPATH = c['paths']+[ join(curDir,'include') ],
-			CPPDEFINES = c['defines']+[c['PROG_NAME']+"_STATIC"]
+			CPPDEFINES = c['defines']+[(c['PROG_NAME']+"_static").upper()]
 		)
 		AddDependency(args, c['PROG_NAME'], curDir)
 		if c.get('inclDepsStatic_tests')!=None:
@@ -138,7 +138,7 @@ def DefaultLibraryConfig(c, env, args):
 			
 			args['prj_env'].Append(
 				CPPPATH = c['paths']+[ join(curDir,'include') ],
-				CPPDEFINES = c['defines']+[c['PROG_NAME']+"_STATIC"]
+				CPPDEFINES = c['defines']+[(c['PROG_NAME']+"_static").upper()]
 			)
 			AddDependency(args, c['PROG_NAME'], curDir)
 			
@@ -246,7 +246,7 @@ def AddDependencyConfig(args, dep, deppath):
 		deppath = '.'
 	definesVar = []
 	if args['ADD_STATIC_DEPENDENCIES'] == 1:
-		definesVar = [dep]
+		definesVar = [dep.upper()]
 	args['prj_env'].Append(
 		LIBPATH = [os.path.join(deppath,args['configuration'],'lib')],
 		LIBS = [dep+args['ARCHITECTURE_CODE']],
@@ -258,7 +258,7 @@ def AddDependencyConfig(args, dep, deppath):
 
 def AddDependency(args, dep, deppath):
 	if args['ADD_STATIC_DEPENDENCIES'] == 1:
-		dep = dep + '_STATIC'
+		dep = dep + '_static'
 	deppath = os.path.abspath(deppath)
 	AddOrdering(args,dep,deppath)
 	AddDependencyConfig(args,dep, deppath)
