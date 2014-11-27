@@ -94,10 +94,10 @@ def prepare_args(ARGUMENTS):
         args['LINK'] = ARGUMENTS.get('linker', 'ld').lower()
         args['CPPPATH'].extend(ARGUMENTS.get('CPPPATH', '').split(';'))
         args['CPPDEFINES'].extend(ARGUMENTS.get('CPPDEFINES', '').split(';'))
-        args['CCFLAGS'] = args['CCFLAGS'].extend(ARGUMENTS.get('CCFLAGS', '').split(';'))
-        args['LINKFLAGS'] = args['LINKFLAGS'].extend(ARGUMENTS.get('LINKFLAGS', '').split(';'))
-        args['LIBPATH'] = args['LIBPATH'].extend(ARGUMENTS.get('LIBPATH', '').split(';'))
-        args['LIBS'] = args['LIBS'].extend(ARGUMENTS.get('LIBS', '').split(';'))
+        args['CCFLAGS'].extend(ARGUMENTS.get('CCFLAGS', '').split(';'))
+        args['LINKFLAGS'].extend(ARGUMENTS.get('LINKFLAGS', '').split(';'))
+        args['LIBPATH'].extend(ARGUMENTS.get('LIBPATH', '').split(';'))
+        args['LIBS'].extend(ARGUMENTS.get('LIBS', '').split(';'))
         print "compiler: "+args['CC']
         print "linker: "+args['LINK']
     return args
