@@ -24,6 +24,8 @@ env = Environment(
 
 if args.has_key('CC') and args['CC'] != None:
     env.Replace(CC=args['CC'])
+if args.has_key('LINK') and args['LINK'] != None:
+    env.Replace(LINK=args['LINK'])
 
 env.AppendENVPath('LD_LIBRARY_PATH', os.path.join(args['INSTALL_PATH'],'lib'))
 env.AppendENVPath('PATH', os.path.join(args['INSTALL_PATH'],'lib'))

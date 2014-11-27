@@ -88,13 +88,23 @@ def prepare_args(ARGUMENTS):
         args = prepare_vc9(args)
         args['MSVC_VERSION'] = '11.0Exp'
     else:
-        print "Unknown compiler: "+args['COMPILER_CODE']
-        exit()
+        print "---Custom---"        
+        args['TOOLS'] = ['default']
+        args['CC'] = args['COMPILER_CODE']
+        args['LINK'] = ARGUMENTS.get('linker', 'ld').lower()
+        args['CPPPATH'].extend(ARGUMENTS.get('CPPPATH', '').split(';'))
+        args['CPPDEFINES'].extend(ARGUMENTS.get('CPPDEFINES', '').split(';'))
+        args['CCFLAGS'] = args['CCFLAGS'].extend(ARGUMENTS.get('CCFLAGS', '').split(';'))
+        args['LINKFLAGS'] = args['LINKFLAGS'].extend(ARGUMENTS.get('LINKFLAGS', '').split(';'))
+        args['LIBPATH'] = args['LIBPATH'].extend(ARGUMENTS.get('LIBPATH', '').split(';'))
+        args['LIBS'] = args['LIBS'].extend(ARGUMENTS.get('LIBS', '').split(';'))
+        print "compiler: "+args['CC']
+        print "linker: "+args['LINK']
     return args
 
 def builder_unit_test(target, source, env):
-    dict = env.Dictionary()
-    if dict['TESTNORUN'] == '0':
+    d = env.Dictionary()
+    if d['TESTNORUN'] == '0':
         app = str(source[0].abspath)
         if os.spawnl(os.P_WAIT, app, app)==0:
             open(str(target[0]),'w').write("PASSED: "+source[0].path+"\n")
