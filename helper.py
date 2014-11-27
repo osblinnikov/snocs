@@ -149,6 +149,7 @@ def DefaultLibraryConfig(c, env, args):
 			env.Default(PrefixProgram(args, 'src', c['runFiles']))
 
 def PrefixProgram(args, folder, srcs):
+	folder = os.path.join(args['SNOCSCRIPT_PATH'],folder)
 	trgt = args['PROG_NAME']
 	print trgt
 	
@@ -175,6 +176,7 @@ def PrefixProgram(args, folder, srcs):
 	return args['APP_BUILD'][targetFullPath]
 
 def PrefixTest(args, folder, srcs):
+	folder = os.path.join(args['SNOCSCRIPT_PATH'],folder)
 	trgt = args['PROG_NAME']
 	folder_trgt = os.path.join(folder, trgt+'.tmp')
 	args['prj_env'].VariantDir(folder_trgt, folder, duplicate=0)
@@ -199,6 +201,7 @@ def PrefixTest(args, folder, srcs):
 
 # Similar to PrefixProgram above, except for Library
 def PrefixLibrary(args, folder, srcs):
+	folder = os.path.join(args['SNOCSCRIPT_PATH'],folder)
 	trgt = args['PROG_NAME']
 	folder_trgt = os.path.join(folder, trgt+'.tmp')
 	args['prj_env'].VariantDir(folder_trgt, folder, duplicate=0)
@@ -216,6 +219,7 @@ def PrefixLibrary(args, folder, srcs):
 	
 # Similar to PrefixProgram above, except for SharedLibrary
 def PrefixSharedLibrary(args, folder, srcs):
+	folder = os.path.join(args['SNOCSCRIPT_PATH'],folder)
 	trgt = args['PROG_NAME']
 	folder_trgt = os.path.join(folder, trgt+'.tmp')
 	args['prj_env'].VariantDir(folder_trgt, folder, duplicate=0)

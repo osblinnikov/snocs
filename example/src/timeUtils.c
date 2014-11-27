@@ -1,4 +1,4 @@
-#include "timeUtils.h"
+#include "../include/timeUtils.h"
 #include <pthread.h>
 #include <stdio.h>
 #if !defined __MINGW32__ && defined _WIN32
