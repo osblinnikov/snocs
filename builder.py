@@ -92,14 +92,14 @@ def prepare_args(ARGUMENTS):
         args['TOOLS'] = ['default']
         args['CC'] = args['COMPILER_CODE']
         args['LINK'] = ARGUMENTS.get('linker', 'ld').lower()
-        args['CPPPATH'].extend(ARGUMENTS.get('CPPPATH', '').split(','))
-        args['CPPDEFINES'].extend(ARGUMENTS.get('CPPDEFINES', '').split(','))
-        args['CCFLAGS'].extend(ARGUMENTS.get('CCFLAGS', '').split(','))
-        args['LINKFLAGS'].extend(ARGUMENTS.get('LINKFLAGS', '').split(','))
-        args['LIBPATH'].extend(ARGUMENTS.get('LIBPATH', '').split(','))
-        args['LIBS'].extend(ARGUMENTS.get('LIBS', '').split(','))
         print "compiler: "+args['CC']
         print "linker: "+args['LINK']
+    args['CPPPATH'].extend(ARGUMENTS.get('CPPPATH', '').split(','))
+    args['CPPDEFINES'].extend(ARGUMENTS.get('CPPDEFINES', '').split(','))
+    args['CCFLAGS'].extend(ARGUMENTS.get('CCFLAGS', '').split(','))
+    args['LINKFLAGS'].extend(ARGUMENTS.get('LINKFLAGS', '').split(','))
+    args['LIBPATH'].extend(ARGUMENTS.get('LIBPATH', '').split(','))
+    args['LIBS'].extend(ARGUMENTS.get('LIBS', '').split(','))        
     return args
 
 def builder_unit_test(target, source, env):
