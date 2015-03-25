@@ -1,4 +1,5 @@
 import os.path
+import os
 import sys
 from gppqt5 import *
 from gpp import *
@@ -9,7 +10,7 @@ from default import *
 from vc9 import *
 
 #PLEASE change it if you don't want the standard snocs location
-PROJECTS_ROOT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', '..'))
+PROJECTS_SRC_PATH = os.getenv('SNOCS_PROJECTS_SRC_PATH', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
 
 def prepare_args(ARGUMENTS):
     #--------command line arguments------------
@@ -51,8 +52,9 @@ def prepare_args(ARGUMENTS):
         args['CCCOMSTR'] = "Compiling $TARGET"
         args['LINKCOMSTR'] = "Linking $TARGET"
     #--------deploy parameters--------
-    args['PROJECTS_ROOT_PATH'] = PROJECTS_ROOT_PATH
-    args['INSTALL_PATH'] = os.path.join(args['PROJECTS_ROOT_PATH'])
+    args['INSTALL_BIN_PATH'] = os.getenv('SNOCS_INSTALL_BIN_PATH', os.path.abspath(os.path.join(PROJECTS_SRC_PATH,'..','bin')))
+    args['INSTALL_LIB_PATH'] = os.getenv('SNOCS_INSTALL_LIB_PATH', os.path.abspath(os.path.join(PROJECTS_SRC_PATH,'..','lib')))
+    args['PROJECTS_SRC_PATH'] = PROJECTS_SRC_PATH
     args['INSTALL_ALIASES'] = [] #here will be the targets for install alias
     args['TEST_ALIASES'] = [] #here will be the targets for test alias
     args['ARCHITECTURE_CODE'] = '_'+args['COMPILER_CODE']+'_'+args['TARGET_ARCH']
@@ -66,7 +68,6 @@ def prepare_args(ARGUMENTS):
     args['CCFLAGS'] = []
     args['LIBS'] = []
     args['LIBPATH']=[]
-    args['PROJECTS_SRC_PATH'] = os.path.join(args['PROJECTS_ROOT_PATH'],'src')
     args['CPPPATH'] = [
         args['PROJECTS_SRC_PATH']
     ]
@@ -108,7 +109,7 @@ def prepare_args(ARGUMENTS):
     args['CCFLAGS'].extend(ARGUMENTS.get('CCFLAGS', '').split(','))
     args['LINKFLAGS'].extend(ARGUMENTS.get('LINKFLAGS', '').split(','))
     args['LIBPATH'].extend(ARGUMENTS.get('LIBPATH', '').split(','))
-    args['LIBS'].extend(ARGUMENTS.get('LIBS', '').split(','))        
+    args['LIBS'].extend(ARGUMENTS.get('LIBS', '').split(','))
     return args
 
 def builder_unit_test(target, source, env):
@@ -153,8 +154,10 @@ def printHelp():
     print "  -all      # execute for all dependent projects"
     print "**********************"
     print "Other options can be SCons specific."
-    print "  If you want to change default path to the Projects directory please see the"
-    print "  builder.py file and PROJECTS_ROOT_PATH variable"
+    print "  If you want to change default path to the sources then"
+    print "  set SNOCS_PROJECTS_SRC_PATH environment variable"
+    print "  If you want to change default installation path then "
+    print "  set SNOCS_INSTALL_LIB_PATH and SNOCS_INSTALL_BIN_PATH environment variables"
     print "  During 'test' phase snocs updates LD_LIBRARY_PATH local copy to provide"
     print "  of shared libraries"
     print "**********************"

@@ -27,9 +27,9 @@ if args.has_key('CC') and args['CC'] != None:
 if args.has_key('LINK') and args['LINK'] != None:
     env.Replace(LINK=args['LINK'])
 
-env.AppendENVPath('LD_LIBRARY_PATH', os.path.join(args['INSTALL_PATH'],'lib'))
-env.AppendENVPath('PATH', os.path.join(args['INSTALL_PATH'],'lib'))
-env.AppendENVPath('PKG_CONFIG_PATH', os.path.join(args['INSTALL_PATH'],'lib','pkgconfig'))
+env.AppendENVPath('LD_LIBRARY_PATH', args['INSTALL_LIB_PATH'])
+env.AppendENVPath('PATH', args['INSTALL_LIB_PATH'])
+env.AppendENVPath('PKG_CONFIG_PATH', os.path.join(args['INSTALL_LIB_PATH'],'pkgconfig'))
 
 if args.has_key('QT_DIR_NAME'):
     env[args['QT_DIR_NAME']] = args['QT_DIR']
@@ -64,8 +64,9 @@ if args.get('CROSSPROJECT_DEPENDENCIES')!=None:
                 args['SNOCSCRIPT_PATH'] = os.path.abspath(os.path.dirname(args['SNOCSCRIPT']))
                 preparePaths(env,args)
                 #start building dependency
-                # print args['SNOCSCRIPT']
+                
                 if args['ALL_PROJECTS'] == '1':
+                    print args['SNOCSCRIPT']
                     SConscript(args['SNOCSCRIPT'])
                 dictLaunchedDependencies[depFullPath] = 1
                 break

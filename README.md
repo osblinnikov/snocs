@@ -8,7 +8,8 @@ SNocs
 4. allows you to choose compiler, platform and configuration from command line
 5. enables you to set up Unit tests for the project
 
-If you want to change default path to the Projects workspace directory just change 'PROJECTS_ROOT_PATH' variable in 'builder.py' file. 
+If you want to change default workspace directory just set SNOCS_PROJECTS_SRC_PATH environment variable. 
+If you want to change default installation paths then set SNOCS_INSTALL_LIB_PATH and SNOCS_INSTALL_BIN_PATH environment variables" 
 
 During test phase of building, SNocs extends it's LD_LIBRARY_PATH and PATH variables to allow searching for shared libraries
 

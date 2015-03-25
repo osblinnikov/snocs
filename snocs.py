@@ -3,7 +3,7 @@ import os.path
 import sys
 import os
 import imp
-from builder import PROJECTS_ROOT_PATH
+from builder import PROJECTS_SRC_PATH
 from builder import printHelp
 
 def main(argv):
@@ -27,8 +27,8 @@ def main(argv):
         elif os.path.exists(os.path.join(argv[firstRealArgI],"SNocscript.py")):
             SNocscript = os.path.join(argv[firstRealArgI],"SNocscript.py")            
         #try to find the SNocscript in the specified path from projects src root
-        elif os.path.exists(os.path.join(PROJECTS_ROOT_PATH,'src',argv[firstRealArgI],"SNocscript.py")):
-            SNocscript = os.path.join(PROJECTS_ROOT_PATH,'src',argv[firstRealArgI],"SNocscript.py")
+        elif os.path.exists(os.path.join(PROJECTS_SRC_PATH,argv[firstRealArgI],"SNocscript.py")):
+            SNocscript = os.path.join(PROJECTS_SRC_PATH,argv[firstRealArgI],"SNocscript.py")
         #try to find the SNocscript right here
         elif os.path.exists(os.path.join(os.getcwd(),"SNocscript.py")):
             firstRealArgI = firstRealArgI - 1
@@ -37,7 +37,7 @@ def main(argv):
             print "No "+os.path.join(os.getcwd(),"SNocscript.py")
             print "No "+os.path.join(argv[firstRealArgI],"SNocscript.py")
             print "No "+os.path.join(os.getcwd(),argv[firstRealArgI],"SNocscript.py")
-            print "No "+os.path.join(PROJECTS_ROOT_PATH,'src',argv[firstRealArgI],"SNocscript.py")
+            print "No "+os.path.join(PROJECTS_SRC_PATH,argv[firstRealArgI],"SNocscript.py")
             print "NO SNocscript files found"
             printHelp()
             exit()
@@ -51,7 +51,7 @@ def main(argv):
                 printHelp()
                 exit()
             elif argv[i] == '-r':
-                os.system("python "+SNocscript+" "+os.path.join(PROJECTS_ROOT_PATH,'src'))
+                os.system("python "+SNocscript+" "+PROJECTS_SRC_PATH)
                 #imp.load_source('SNocscript',os.path.dirname(SNocscript))
                 exit()
             elif argv[i] == '-all':

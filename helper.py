@@ -216,7 +216,7 @@ def PrefixProgram(args, folder, srcs):
     source = srcs, 
     LINKCOM  = [args['prj_env']['LINKCOM'], linkom]
   )
-  args['INSTALL_ALIASES'].append(args['prj_env'].Install(os.path.join(args['INSTALL_PATH'],'bin'), args['APP_BUILD'][targetFullPath]))#setup install directory
+  args['INSTALL_ALIASES'].append(args['prj_env'].Install(args['INSTALL_BIN_PATH'], args['APP_BUILD'][targetFullPath]))#setup install directory
 
   return args['APP_BUILD'][targetFullPath]
 
@@ -237,7 +237,7 @@ def PrefixTest(args, folder, srcs):
   targetFullPath = os.path.join(args['SNOCSCRIPT_PATH'],trgt + args['ARCHITECTURE_CODE'])
   targetFullPathToBin = os.path.join(args['BIN_DIR'],trgt+args['ARCHITECTURE_CODE'])
   args['APP_BUILD'][targetFullPath] = args['prj_env'].Program(target = targetFullPathToBin, source = srcs, LINKCOM  = [args['prj_env']['LINKCOM'], linkom])
-  args['INSTALL_ALIASES'].append(args['prj_env'].Install(os.path.join(args['INSTALL_PATH'],'bin'), args['APP_BUILD'][targetFullPath]))#setup install directory
+  args['INSTALL_ALIASES'].append(args['prj_env'].Install(args['INSTALL_BIN_PATH'], args['APP_BUILD'][targetFullPath]))#setup install directory
 
   testPassedFullPath = os.path.join(args['SNOCSCRIPT_PATH'],args['configuration'],'bin',trgt+args['ARCHITECTURE_CODE']+".passed")
   args['TEST_ALIASES'].append(args['prj_env'].Test(testPassedFullPath, args['APP_BUILD'][targetFullPath]))
@@ -259,7 +259,7 @@ def PrefixLibrary(args, folder, srcs):
   targetFullPath = os.path.join(args['SNOCSCRIPT_PATH'],trgt+args['ARCHITECTURE_CODE'])
   targetFullPathToBin = os.path.join(args['LIB_DIR'],trgt+args['ARCHITECTURE_CODE'])
   args['APP_BUILD'][targetFullPath] = args['prj_env'].Library(target = targetFullPathToBin, source = srcs)
-  args['INSTALL_ALIASES'].append(args['prj_env'].Install(os.path.join(args['INSTALL_PATH'],'lib'), args['APP_BUILD'][targetFullPath]))#setup install directory
+  args['INSTALL_ALIASES'].append(args['prj_env'].Install(args['INSTALL_LIB_PATH'], args['APP_BUILD'][targetFullPath]))#setup install directory
   return args['APP_BUILD'][targetFullPath]
   
 # Similar to PrefixProgram above, except for SharedLibrary
@@ -280,7 +280,7 @@ def PrefixSharedLibrary(args, folder, srcs):
   targetFullPath = os.path.join(args['SNOCSCRIPT_PATH'],trgt+args['ARCHITECTURE_CODE'])
   targetFullPathToBin = os.path.join(args['LIB_DIR'],trgt+args['ARCHITECTURE_CODE'])
   args['APP_BUILD'][targetFullPath] = args['prj_env'].SharedLibrary(target = targetFullPathToBin, source = srcs, LINKCOM  = [args['prj_env']['LINKCOM'], linkom]) 
-  args['INSTALL_ALIASES'].append(args['prj_env'].Install(os.path.join(args['INSTALL_PATH'],'lib'), args['APP_BUILD'][targetFullPath]))#setup install directory
+  args['INSTALL_ALIASES'].append(args['prj_env'].Install(args['INSTALL_LIB_PATH'], args['APP_BUILD'][targetFullPath]))#setup install directory
   return args['APP_BUILD'][targetFullPath]
 
 def PrefixFilename(filename, extensions):
@@ -309,7 +309,7 @@ def AddDependencyConfig(args, dep, deppath):
 def AddDependency(args, dep, deppath):
   if args['ADD_STATIC_DEPENDENCIES'] == 1:
     dep = dep + '_static'
-  deppath = os.path.abspath(deppath)
+  deppath = os.path.abspath(os.path.join(args['PROJECTS_SRC_PATH'],deppath))
   AddOrdering(args,dep,deppath)
   AddDependencyConfig(args,dep, deppath)
   
