@@ -26,25 +26,30 @@ Enjoy your crossplatform usage of SNocs!
 Usage
 ---
 
-snocs [SNocscriptFilePath] [options]
+snocs [SNocscriptFilePath] [options] [target]
 
 SNocscriptFilePath can be absolute or relative to current path or 
 relative to workspace sources root directory e.g.:
 
-    snocs example compiler=gcc test
+    snocs example compiler=gpp_cpp11 test
 
 Available SNocs options:
 
-    compiler={gcc,gpp,gppqt5,mingw,vc9,vc10,vc11,vc11exp}
+    compiler={gcc,gpp,gpp_cpp11,gppqt5,mingw,vc9,vc10,vc11,vc11exp}
     configuration={Debug,Release}
     platform={x86,Win32,x64} # Win32 is an alias to x86
     verbose=1 # enables scons debug output
     shared=1 | 0 #enables building shared libraries for default build config
     testnorun=1 #disables tests run in case of test/install targets
     -r        # execute SNocscriptFilePath/SNocscript as Python script without SCons
-    -c        # execute cleaning only for chosen SNocscript, not dependent libs
-    -call     # execute cleaning for current and all dependent projects
-    
+    -c        # execute cleaning
+    -all      # execute for all dependent projects
+
+Available targets:
+
+    test
+    install
+
 Other options can be specific for SCons
 
 Examples:

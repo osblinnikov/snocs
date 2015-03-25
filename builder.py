@@ -2,13 +2,14 @@ import os.path
 import sys
 from gppqt5 import *
 from gpp import *
+from gpp_cpp11 import *
 from gcc import *
 from mingw import *
 from default import *
 from vc9 import *
 
 #PLEASE change it if you don't want the standard snocs location
-PROJECTS_ROOT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),'..','..','..','..'))
+PROJECTS_ROOT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', '..'))
 
 def prepare_args(ARGUMENTS):
     #--------command line arguments------------
@@ -20,9 +21,15 @@ def prepare_args(ARGUMENTS):
     else:
         args['NO_DYNAMIC_BUILD'] = '0'
         args['NO_STATIC_BUILD'] = '1'
+
+    if args['NO_STATIC_BUILD'] != '1':
+        args['ADD_STATIC_DEPENDENCIES'] = 1
+    if args['NO_DYNAMIC_BUILD'] != '1':
+        args['ADD_STATIC_DEPENDENCIES'] = 0        
+
     # args['CC'] = None
-    args['CLEANING_STAGE'] = ARGUMENTS.get('cleaning_all', '0')
-    args['ONLY_PROJECT_CLEANING_STAGE'] = ARGUMENTS.get('cleaning_one', '0')
+    args['CLEANING_STAGE'] = ARGUMENTS.get('cleaning', '0')
+    args['ALL_PROJECTS'] = ARGUMENTS.get('build_all', '0')
     args['TESTNORUN'] = ARGUMENTS.get('testnorun', '0')
     args['SNOCSCRIPT'] = ARGUMENTS.get('snocscript', None)
     if args['SNOCSCRIPT'] == None or args['SNOCSCRIPT']=="":
@@ -71,7 +78,9 @@ def prepare_args(ARGUMENTS):
     elif args['COMPILER_CODE'] == 'gppqt5':
         args = prepare_gppqt5(args)       
     elif args['COMPILER_CODE'] == 'gpp':
-        args = prepare_gpp(args)        
+        args = prepare_gpp(args)     
+    elif args['COMPILER_CODE'] == 'gpp_cpp11':
+        args = prepare_gpp_cpp11(args)            
     elif args['COMPILER_CODE'] == 'gcc':
         args = prepare_gcc(args)
     elif args['COMPILER_CODE'] == 'mingw':
@@ -132,7 +141,7 @@ def printHelp():
     print "  snocs example compiler=vc9 test"
     print "**********************"
     print "Available options:"
-    print "  compiler={gcc,gpp,gppqt5,mingw,vc9,vc10,vc11,vc11exp}"
+    print "  compiler={gcc,gpp,gpp_cpp11,gppqt5,mingw,vc9,vc10,vc11,vc11exp}"
     print "  configuration={Debug,Release}"
     print "  platform={x86,Win32,x64} # Win32 is an alias to x86"
     print "  verbose=1 # enables scons debug output"
@@ -140,8 +149,8 @@ def printHelp():
     print "  testnorun=0 | 1 #disables tests run in case of test/install targets"
     print "  -r        # execute SNocscriptFilePath/SNocscript as Python script"
     print "  -h        # print this help"
-    print "  -c        # execute cleaning only for chosen SNocscript, not dependent libs"
-    print "  -call     # execute cleaning for current and all dependent projects"
+    print "  -c        # execute cleaning"
+    print "  -all      # execute for all dependent projects"
     print "**********************"
     print "Other options can be SCons specific."
     print "  If you want to change default path to the Projects directory please see the"

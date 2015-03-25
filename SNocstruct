@@ -50,27 +50,30 @@ preparePaths(env,args)
 #start main build
 print args['SNOCSCRIPT']
 SConscript( args['SNOCSCRIPT'] )
-if args['ONLY_PROJECT_CLEANING_STAGE'] == '0':
-    #Include crossproject dependencies
-    dictLaunchedDependencies = {}
-    if args.get('CROSSPROJECT_DEPENDENCIES')!=None:
-        foundNewDependency = 1
-        while foundNewDependency == 1:
-            foundNewDependency = 0
-            for depFullPath in args['CROSSPROJECT_DEPENDENCIES']:
-                if depFullPath not in dictLaunchedDependencies:
-                    foundNewDependency = 1
-                    args['SNOCSCRIPT'] = os.path.join(depFullPath,'SNocscript.py')
-                    args['SNOCSCRIPT_PATH'] = os.path.abspath(os.path.dirname(args['SNOCSCRIPT']))
-                    preparePaths(env,args)
-                    #start building dependency
-                    # print args['SNOCSCRIPT']
+
+#Include crossproject dependencies
+dictLaunchedDependencies = {}
+if args.get('CROSSPROJECT_DEPENDENCIES')!=None:
+    foundNewDependency = 1
+    while foundNewDependency == 1:
+        foundNewDependency = 0
+        for depFullPath in args['CROSSPROJECT_DEPENDENCIES']:
+            if depFullPath not in dictLaunchedDependencies:
+                foundNewDependency = 1
+                args['SNOCSCRIPT'] = os.path.join(depFullPath,'SNocscript.py')
+                args['SNOCSCRIPT_PATH'] = os.path.abspath(os.path.dirname(args['SNOCSCRIPT']))
+                preparePaths(env,args)
+                #start building dependency
+                # print args['SNOCSCRIPT']
+                if args['ALL_PROJECTS'] == '1':
                     SConscript(args['SNOCSCRIPT'])
-                    dictLaunchedDependencies[depFullPath] = 1
-                    break
-    #--------------------------------------
-    #           Setting scons require()
-    #--------------------------------------
+                dictLaunchedDependencies[depFullPath] = 1
+                break
+
+#--------------------------------------
+#           Setting scons require()
+#--------------------------------------
+if args['ALL_PROJECTS'] == '1':
     for prog in args['APP_DEPENDENCIES']:
         for dep in args['APP_DEPENDENCIES'][prog]:
             # print prog+" depending on "+dep
