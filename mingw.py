@@ -2,20 +2,20 @@ import os.path
 import sys
 import string
 
-def prepare_mingw(args):
-    args['TOOLS'] = ['mingw']
-    args['CPPPATH'].extend([])
-    args['CPPDEFINES'].extend([])
-    args['LIBPATH'].extend([])
-    if args['TARGET_ARCH'] == 'x86':
-        args['CCFLAGS'].extend(['-m32'])
-        args['LINKFLAGS'].extend(['-m32'])
-    elif args['TARGET_ARCH'] == 'x64':
-        args['CCFLAGS'].extend(['-m64'])
-        args['LINKFLAGS'].extend(['-m64'])
+def prepare_mingw(env):
+    env['TOOLS'] = ['mingw']
+    env['CPPPATH'].extend([])
+    env['CPPDEFINES'].extend([])
+    env['LIBPATH'].extend([])
+    if env['PLATFORM'] == 'x86':
+        env['CCFLAGS'].extend(['-m32'])
+        env['LINKFLAGS'].extend(['-m32'])
+    elif env['PLATFORM'] == 'x64':
+        env['CCFLAGS'].extend(['-m64'])
+        env['LINKFLAGS'].extend(['-m64'])
     else:
-        print "Unknown architecture: "+args['TARGET_ARCH']
+        print "Unknown platform: "+env['PLATFORM']
         exit()
-    if args['configuration'] == 'Debug':
-        args['CCFLAGS'].extend(['-g'])
-    return args
+    if env['CONFIGURATION'] == 'Debug':
+        env['CCFLAGS'].extend(['-g'])
+    return env

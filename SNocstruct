@@ -2,85 +2,100 @@ import os.path
 import sys
 from builder import *
 
-args = prepare_args(ARGUMENTS)
+env = prepare_env(ARGUMENTS)
 
-env = Environment(
-    TESTNORUN = args['TESTNORUN'],
+env['scons'] = Environment(
+    TESTNORUN = env['TESTNORUN'],
     BUILDERS = {'Test' :  Builder(action = builder_unit_test)},
-    TOOLS  = args['TOOLS'],    
-    TARGET_ARCH  = args['TARGET_ARCH'],
-    MSVC_VERSION = args['MSVC_VERSION'],
-    LIBPATH = args['LIBPATH'],
-    LIBS = args['LIBS'],
-    LINKFLAGS = args['LINKFLAGS'],
-    # CC=args['CC'],
-    CPPPATH = args['CPPPATH'],
-    CPPDEFINES = args['CPPDEFINES'],
-    CCFLAGS = args['CCFLAGS'],
-    CCCOMSTR = args['CCCOMSTR'],
-    LINKCOMSTR = args['LINKCOMSTR'],
+    TOOLS  = env['TOOLS'],    
+    TARGET_ARCH  = env['PLATFORM'],
+    MSVC_VERSION = env['MSVC_VERSION'],
+    LIBPATH = env['LIBPATH'],
+    LIBS = env['LIBS'],
+    LINKFLAGS = env['LINKFLAGS'],
+    # CC=env['CC'],
+    CPPPATH = env['CPPPATH'],
+    CPPDEFINES = env['CPPDEFINES'],
+    CCFLAGS = env['CCFLAGS'],
     ENV = os.environ
 )
 
-if args.has_key('CC') and args['CC'] != None:
-    env.Replace(CC=args['CC'])
-if args.has_key('LINK') and args['LINK'] != None:
-    env.Replace(LINK=args['LINK'])
+verbosity =  int(env['VERBOSE'])
+if verbosity == 0:
+    env['scons']['CCCOMSTR'] = "Compiling $TARGET"
+    env['scons']['CXXCOMSTR'] = "Compiling $TARGET"
+    env['scons']['LINKCOMSTR'] = "Linking $TARGET"
+    env['scons']['ARCOMSTR'] = "Archieving $TARGET"
+elif verbosity == 1:
+    env['scons']['CCCOMSTR'] = "Compiling $TARGET $CCFLAGS"
+    env['scons']['CXXCOMSTR'] = "Compiling $TARGET $CCFLAGS"
+    env['scons']['LINKCOMSTR'] = "Linking $TARGET $LINKFLAGS"
+    env['scons']['ARCOMSTR'] = "Archieving $TARGET $LINKFLAGS"
+else:
+    Progress('Evaluating $TARGET\n')
 
-env.AppendENVPath('LD_LIBRARY_PATH', args['INSTALL_LIB_PATH'])
-env.AppendENVPath('PATH', args['INSTALL_LIB_PATH'])
-env.AppendENVPath('PKG_CONFIG_PATH', os.path.join(args['INSTALL_LIB_PATH'],'pkgconfig'))
+        
 
-if args.has_key('QT_DIR_NAME'):
-    env[args['QT_DIR_NAME']] = args['QT_DIR']
-    env.AppendENVPath('PKG_CONFIG_PATH', args['QT_PKG_CONFIG_PATH'])
-    env.Tool(args['QT_TOOL'])
+if env.has_key('CC') and env['CC'] != None:
+    env['scons'].Replace(CC=env['CC'])
+if env.has_key('LINK') and env['LINK'] != None:
+    env['scons'].Replace(LINK=env['LINK'])
+
+env['scons'].AppendENVPath('LD_LIBRARY_PATH', env['INSTALL_LIB_PATH'])
+env['scons'].AppendENVPath('PATH', env['INSTALL_LIB_PATH'])
+env['scons'].AppendENVPath('PKG_CONFIG_PATH', os.path.join(env['INSTALL_LIB_PATH'],'pkgconfig'))
+
+if env.has_key('QT_DIR_NAME'):
+    env['scons'][env['QT_DIR_NAME']] = env['QT_DIR']
+    env['scons'].AppendENVPath('PKG_CONFIG_PATH', env['QT_PKG_CONFIG_PATH'])
+    env['scons'].Tool(env['QT_TOOL'])
                 
 # Progress('Evaluating $TARGET\n')
-env.Decider( 'MD5-timestamp' )          # For speed, use timestamps for change, followed by MD5
-# Export this environment for use by the SNocscript files
-Export( 'env', 'args' )
+env['scons'].Decider( 'MD5-timestamp' )          # For speed, use timestamps for change, followed by MD5
 
 #--------------------------------------
 #           SOLUTION Builders
 #--------------------------------------
-args['SNOCSCRIPT_PATH'] = os.path.abspath(os.path.dirname(args['SNOCSCRIPT']))
-preparePaths(env,args)
-                
+preparePaths(env)
+
 #start main build
-print args['SNOCSCRIPT']
-SConscript( args['SNOCSCRIPT'] )
+if verbosity > 1:
+    print env['SNOCSCRIPT_PATH']
+# Export this environment for use by the SNocscript files
+Export( 'env' )
+SConscript( env['SNOCSCRIPT'] )
 
 #Include crossproject dependencies
 dictLaunchedDependencies = {}
-if args.get('CROSSPROJECT_DEPENDENCIES')!=None:
+if env.get('CROSSPROJECT_DEPENDENCIES')!=None:
     foundNewDependency = 1
     while foundNewDependency == 1:
         foundNewDependency = 0
-        for depFullPath in args['CROSSPROJECT_DEPENDENCIES']:
+        for depFullPath in env['CROSSPROJECT_DEPENDENCIES']:
             if depFullPath not in dictLaunchedDependencies:
                 foundNewDependency = 1
-                args['SNOCSCRIPT'] = os.path.join(depFullPath,'SNocscript.py')
-                args['SNOCSCRIPT_PATH'] = os.path.abspath(os.path.dirname(args['SNOCSCRIPT']))
-                preparePaths(env,args)
+                env['SNOCSCRIPT'] = os.path.join(depFullPath,'SNocscript.py')
+                env['SNOCSCRIPT_PATH'] = os.path.abspath(os.path.dirname(env['SNOCSCRIPT']))
+                preparePaths(env)
                 #start building dependency
                 
-                if args['ALL_PROJECTS'] == '1':
-                    print args['SNOCSCRIPT']
-                    SConscript(args['SNOCSCRIPT'])
+                if env['BUILD_ALL'] == '1':
+                    if verbosity > 1:
+                        print env['SNOCSCRIPT_PATH']
+                    SConscript(env['SNOCSCRIPT'])
                 dictLaunchedDependencies[depFullPath] = 1
                 break
 
 #--------------------------------------
 #           Setting scons require()
 #--------------------------------------
-if args['ALL_PROJECTS'] == '1':
-    for prog in args['APP_DEPENDENCIES']:
-        for dep in args['APP_DEPENDENCIES'][prog]:
+if env['BUILD_ALL'] == '1':
+    for prog in env['APP_DEPENDENCIES']:
+        for dep in env['APP_DEPENDENCIES'][prog]:
             # print prog+" depending on "+dep
-            if args['APP_BUILD'].has_key(prog) and args['APP_BUILD'].has_key(dep):
-                Requires(args['APP_BUILD'][prog], args['APP_BUILD'][dep])
+            if env['APP_BUILD'].has_key(prog) and env['APP_BUILD'].has_key(dep):
+                Requires(env['APP_BUILD'][prog], env['APP_BUILD'][dep])
 
-args['INSTALL_ALIASES'].append( args['TEST_ALIASES'] )
-Alias('test', args['TEST_ALIASES'])#run when test command provided in command line
-Alias('install', args['INSTALL_ALIASES'])#run when install command provided in command line
+env['INSTALL_ALIASES'].append( env['TEST_ALIASES'] )
+Alias('test', env['TEST_ALIASES'])#run when test command provided in command line
+Alias('install', env['INSTALL_ALIASES'])#run when install command provided in command line

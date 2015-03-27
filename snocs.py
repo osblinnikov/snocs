@@ -55,6 +55,7 @@ def main(argv):
                 #imp.load_source('SNocscript',os.path.dirname(SNocscript))
                 exit()
             elif argv[i] == '-all':
+                print "* Will make the dependencies"
                 ALL_PROJECTS = 1
                 continue
             elif argv[i] == '-c':

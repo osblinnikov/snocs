@@ -1,9 +1,9 @@
 import os.path
 import os
 import sys
-from gppqt5 import *
+import copy
+
 from gpp import *
-from gpp_cpp11 import *
 from gcc import *
 from mingw import *
 from default import *
@@ -12,105 +12,107 @@ from vc9 import *
 #PLEASE change it if you don't want the standard snocs location
 PROJECTS_SRC_PATH = os.getenv('SNOCS_PROJECTS_SRC_PATH', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
 
-def prepare_args(ARGUMENTS):
+def prepare_env(ARGUMENTS):
     #--------command line arguments------------
-    args = {}
-    isShared = ARGUMENTS.get('shared', '0')
-    if isShared == '0':
-        args['NO_DYNAMIC_BUILD'] = '1'
-        args['NO_STATIC_BUILD'] = '0'
-    else:
-        args['NO_DYNAMIC_BUILD'] = '0'
-        args['NO_STATIC_BUILD'] = '1'
+    env = {}
+    for k,v in ARGUMENTS.iteritems():
+        env[k.upper()] = v
 
-    if args['NO_STATIC_BUILD'] != '1':
-        args['ADD_STATIC_DEPENDENCIES'] = 1
-    if args['NO_DYNAMIC_BUILD'] != '1':
-        args['ADD_STATIC_DEPENDENCIES'] = 0        
+    #init defaults
+    env['SHARED'] = ARGUMENTS.get('shared', '0')
+    env['CLEANING'] = ARGUMENTS.get('cleaning', '0')
+    env['BUILD_ALL'] = ARGUMENTS.get('build_all', '0')
+    env['TESTNORUN'] = ARGUMENTS.get('testnorun', '0')
+    env['SNOCSCRIPT'] = ARGUMENTS.get('snocscript', None)
+    env['CONFIGURATION'] = ARGUMENTS.get('configuration', 'Release')
+    env['COMPILER'] = ARGUMENTS.get('compiler', 'gcc')
+    env['TARGET_ARCH'] = env['PLATFORM'] = ARGUMENTS.get('platform', 'x86')
+    env['LINKER'] = ARGUMENTS.get('linker', 'ld')
+    env['WITHOUT'] = ARGUMENTS.get('WITHOUT', '').split(':')
 
-    # args['CC'] = None
-    args['CLEANING_STAGE'] = ARGUMENTS.get('cleaning', '0')
-    args['ALL_PROJECTS'] = ARGUMENTS.get('build_all', '0')
-    args['TESTNORUN'] = ARGUMENTS.get('testnorun', '0')
-    args['SNOCSCRIPT'] = ARGUMENTS.get('snocscript', None)
-    if args['SNOCSCRIPT'] == None or args['SNOCSCRIPT']=="":
+    if env['SNOCSCRIPT'] == None or env['SNOCSCRIPT']=="":
         print "SNocscript is not specified!"
         exit()
-    args['configuration'] = ARGUMENTS.get('configuration', 'Release')
-    if args['configuration'] == 'debug':
-        args['configuration'] = 'Debug'
-    if args['configuration'] != 'Debug':
-        args['configuration'] = 'Release'
-    args['COMPILER_CODE'] = ARGUMENTS.get('compiler', 'gcc').lower()
-    args['TARGET_ARCH'] = ARGUMENTS.get('platform', 'x86').lower()
-    if args['TARGET_ARCH'] == 'Win32':
-        args['TARGET_ARCH'] = 'x86'
-    args['TARGET_ARCH'] = args['TARGET_ARCH'].lower()
-    args['CCCOMSTR'] = None
-    args['LINKCOMSTR'] = None
-    if ARGUMENTS.get('verbose') != "1":
-        args['CCCOMSTR'] = "Compiling $TARGET"
-        args['LINKCOMSTR'] = "Linking $TARGET"
+    
+    if env['CONFIGURATION'].lower() == 'debug'.lower():
+        env['CONFIGURATION'] = 'Debug'
+    else:
+        env['CONFIGURATION'] = 'Release'
+    
+    if env['PLATFORM'].lower() == 'Win32'.lower():
+        env['PLATFORM'] = 'x86'
+
+
     #--------deploy parameters--------
-    args['INSTALL_BIN_PATH'] = os.getenv('SNOCS_INSTALL_BIN_PATH', os.path.abspath(os.path.join(PROJECTS_SRC_PATH,'..','bin')))
-    args['INSTALL_LIB_PATH'] = os.getenv('SNOCS_INSTALL_LIB_PATH', os.path.abspath(os.path.join(PROJECTS_SRC_PATH,'..','lib')))
-    args['PROJECTS_SRC_PATH'] = PROJECTS_SRC_PATH
-    args['INSTALL_ALIASES'] = [] #here will be the targets for install alias
-    args['TEST_ALIASES'] = [] #here will be the targets for test alias
-    args['ARCHITECTURE_CODE'] = '_'+args['COMPILER_CODE']+'_'+args['TARGET_ARCH']
+    env['INSTALL_BIN_PATH'] = os.getenv('SNOCS_INSTALL_BIN_PATH', os.path.abspath(os.path.join(PROJECTS_SRC_PATH,'..','bin')))
+    env['INSTALL_LIB_PATH'] = os.getenv('SNOCS_INSTALL_LIB_PATH', os.path.abspath(os.path.join(PROJECTS_SRC_PATH,'..','lib')))
+    env['PROJECTS_SRC_PATH'] = PROJECTS_SRC_PATH
+    env['INSTALL_ALIASES'] = [] #here will be the targets for install alias
+    env['TEST_ALIASES'] = [] #here will be the targets for test alias
+    env['ARCHITECTURE_CODE'] = '_'+env['COMPILER']+'_'+env['PLATFORM']
     #---------init params-----------
-    args['MSVC_PDB'] = 0
-    args['MSVC_VERSION'] = None
-    args['APP_DEPENDENCIES'] = {}
-    args['APP_BUILD'] = {}
-    args['TOOLS'] = 'default'
-    args['LINKFLAGS'] = []
-    args['CCFLAGS'] = []
-    args['LIBS'] = []
-    args['LIBPATH']=[]
-    args['CPPPATH'] = [
-        args['PROJECTS_SRC_PATH']
+    env['MSVC_PDB'] = 0
+    env['MSVC_VERSION'] = None
+    env['APP_DEPENDENCIES'] = {}
+    env['APP_BUILD'] = {}
+    env['TOOLS'] = 'default'
+    env['LINKFLAGS'] = []
+    env['CCFLAGS'] = []
+    env['LIBS'] = []
+    env['LIBPATH']=[]
+    env['CPPPATH'] = [
+        env['PROJECTS_SRC_PATH']
     ]
-    args['CPPDEFINES'] = []
+    env['CPPDEFINES'] = []
     #--------SWITCHING COMPILER------
-    if args['COMPILER_CODE'] == 'default':
+    if env['COMPILER'] == 'default':
         print "WARNING: compiler was not specified, using default parameters"
-        args = prepare_default(args)
-    elif args['COMPILER_CODE'] == 'gppqt5':
-        args = prepare_gppqt5(args)       
-    elif args['COMPILER_CODE'] == 'gpp':
-        args = prepare_gpp(args)     
-    elif args['COMPILER_CODE'] == 'gpp_cpp11':
-        args = prepare_gpp_cpp11(args)            
-    elif args['COMPILER_CODE'] == 'gcc':
-        args = prepare_gcc(args)
-    elif args['COMPILER_CODE'] == 'mingw':
-        args = prepare_mingw(args)
-    elif args['COMPILER_CODE'] == 'vc9':
-        args = prepare_vc9(args)
-    elif args['COMPILER_CODE'] == 'vc10':
-        args = prepare_vc9(args)
-        args['MSVC_VERSION'] = '10.0'
-    elif args['COMPILER_CODE'] == 'vc11':
-        args = prepare_vc9(args)
-        args['MSVC_VERSION'] = '11.0'
-    elif args['COMPILER_CODE'] == 'vc11exp':
-        args = prepare_vc9(args)
-        args['MSVC_VERSION'] = '11.0Exp'
+        env = prepare_default(env)      
+    elif env['COMPILER'] == 'gpp':
+        env = prepare_gpp(env,False,False,False)
+    elif env['COMPILER'] == 'gppwarn':
+        env = prepare_gpp(env,False,True,False)
+    elif env['COMPILER'] == 'gppwarnerr':
+        env = prepare_gpp(env,False,True,True) 
+    elif env['COMPILER'] == 'gppqt5':
+        env = prepare_gpp(env,True,False,False)
+    elif env['COMPILER'] == 'gppqt5warn':
+        env = prepare_gpp(env,True,True,False)  
+    elif env['COMPILER'] == 'gppqt5warnerr':
+        env = prepare_gpp(env,True,True,True)
+    elif env['COMPILER'] == 'gcc':
+        env = prepare_gcc(env)
+    elif env['COMPILER'] == 'mingw':
+        env = prepare_mingw(env)
+    elif env['COMPILER'] == 'vc9':
+        env = prepare_vc9(env)
+        env['MSVC_VERSION'] = '9.0'
+    elif env['COMPILER'] == 'vc10':
+        env = prepare_vc9(env)
+        env['MSVC_VERSION'] = '10.0'
+    elif env['COMPILER'] == 'vc11':
+        env = prepare_vc9(env)
+        env['MSVC_VERSION'] = '11.0'
+    elif env['COMPILER'] == 'vc11exp':
+        env = prepare_vc9(env)
+        env['MSVC_VERSION'] = '11.0Exp'
     else:
         print "---Custom---"        
-        args['TOOLS'] = ['default']
-        args['CC'] = args['COMPILER_CODE']
-        args['LINK'] = ARGUMENTS.get('linker', 'ld').lower()
-        print "compiler: "+args['CC']
-        print "linker: "+args['LINK']
-    args['CPPPATH'].extend(ARGUMENTS.get('CPPPATH', '').split(','))
-    args['CPPDEFINES'].extend(ARGUMENTS.get('CPPDEFINES', '').split(','))
-    args['CCFLAGS'].extend(ARGUMENTS.get('CCFLAGS', '').split(','))
-    args['LINKFLAGS'].extend(ARGUMENTS.get('LINKFLAGS', '').split(','))
-    args['LIBPATH'].extend(ARGUMENTS.get('LIBPATH', '').split(','))
-    args['LIBS'].extend(ARGUMENTS.get('LIBS', '').split(','))
-    return args
+        env['TOOLS'] = ['default']
+        env['CC'] = env['COMPILER']
+        env['LINK'] = env['LINKER']
+        print "compiler: "+env['CC']
+        print "linker: "+env['LINK']
+
+    env['CPPPATH'].extend(ARGUMENTS.get('CPPPATH', '').split(':'))
+    env['CPPDEFINES'].extend(ARGUMENTS.get('CPPDEFINES', '').split(':'))
+    env['CCFLAGS'].extend(ARGUMENTS.get('CCFLAGS', '').split(':'))
+    env['LINKFLAGS'].extend(ARGUMENTS.get('LINKFLAGS', '').split(':'))
+    env['LIBPATH'].extend(ARGUMENTS.get('LIBPATH', '').split(':'))
+    env['LIBS'].extend(ARGUMENTS.get('LIBS', '').split(':'))
+    env['bcp'] = copy.deepcopy(env)
+
+    return env
 
 def builder_unit_test(target, source, env):
     d = env.Dictionary()
@@ -122,11 +124,19 @@ def builder_unit_test(target, source, env):
             open(str(target[0]),'w').write("FAILED: "+source[0].path+"\n")
             return 1
 
-def preparePaths(env,args):
-    args['BIN_DIR'] = os.path.join(args['SNOCSCRIPT_PATH'], args['configuration'], 'bin')
-    args['LIB_DIR'] = os.path.join(args['SNOCSCRIPT_PATH'], args['configuration'], 'lib')
-    env.AppendENVPath('LD_LIBRARY_PATH', args['LIB_DIR'])
-    env.AppendENVPath('PATH', args['LIB_DIR'])
+def preparePaths(env):
+    # scons = env['scons']
+    # bcp = env['bcp']
+    # env = copy.deepcopy(env['bcp'])
+    # env['bcp'] = bcp
+    # env['scons'] = scons
+
+    env['SNOCSCRIPT_PATH'] = os.path.abspath(os.path.dirname(env['SNOCSCRIPT']))
+
+    env['BIN_DIR'] = os.path.join(env['SNOCSCRIPT_PATH'], env['CONFIGURATION'], 'bin')
+    env['LIB_DIR'] = os.path.join(env['SNOCSCRIPT_PATH'], env['CONFIGURATION'], 'lib')
+    env['scons'].AppendENVPath('LD_LIBRARY_PATH', env['LIB_DIR'])
+    env['scons'].AppendENVPath('PATH', env['LIB_DIR'])
 
 def printHelp():
     print "**********************"
@@ -142,7 +152,7 @@ def printHelp():
     print "  snocs example compiler=vc9 test"
     print "**********************"
     print "Available options:"
-    print "  compiler={gcc,gpp,gpp_cpp11,gppqt5,mingw,vc9,vc10,vc11,vc11exp}"
+    print "  compiler={gcc,gpp,gppwarn,gppqt5,gppqt5warn,mingw,vc9,vc10,vc11,vc11exp}"
     print "  configuration={Debug,Release}"
     print "  platform={x86,Win32,x64} # Win32 is an alias to x86"
     print "  verbose=1 # enables scons debug output"
