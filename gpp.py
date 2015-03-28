@@ -3,15 +3,20 @@ import sys
 import string
 
 
-def prepare_gpp(env, withqt, morewarns, warnaserr):
+def prepare_gpp(env, morewarns, warnaserr):
     additionalCCFLAGS = []
 
     env['CC'] = 'g++'
     env['TOOLS'] = ['default']
-    
-    if withqt:
-        env['QT_TOOL'] = 'qt5'
-        env['QT_DIR_NAME'] = 'QT5DIR'
+    env['QT_TOOL'] = os.environ.get("QT_TOOL", "False")
+    if env['QT_TOOL'] != False:
+        if env['QT_TOOL'] == 'qt5':
+          env['QT_DIR_NAME'] = 'QT5DIR'
+        elif env['QT_TOOL'] == 'qt4':
+          env['QT_DIR_NAME'] = 'QT4DIR'
+        else:
+          print 'Unknown QT_TOOL '+env['QT_TOOL']
+          Exit(1)
         env['QT_DIR'] = detectLatestQtDir(env['PLATFORM'])
         if not os.path.exists(env['QT_DIR']):
             print 'either QTDIR environment variable is not set or '+env['QT_DIR']+" is not exists"

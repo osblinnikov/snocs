@@ -29,24 +29,28 @@ def DefaultParentConfig(env,c):
     c['inclDepsStatic'](env)
 
 def enableQtModules(env,c, doBuildUI):
-  if c.has_key('qt5modules') and env['QT_DIR_NAME']=='QT5DIR':
-    env['scons'].EnableQt5Modules(c['qt5modules'])
+  # addPaths = []
+  if c.has_key('qt5modules') and env['QT_TOOL']=='qt5':
+    env['prj_env'].EnableQt5Modules(c['qt5modules'])
+    # addPaths = [os.path.abspath(os.path.join(env['QT_DIR'], 'include', x)) for x in c['qt5modules']]
     if doBuildUI:
       qtuisrc = []
       if c.has_key('qt5ui'):
-        qtuisrc = PrefixSources(env, '', c['qt4ui'])
+        qtuisrc = PrefixSources(env, '', c['qt5ui'])
 
       for s in qtuisrc:
-        env['scons'].Uic5(s)
+        env['prj_env'].Uic5(s)
 
-  if c.has_key('qt4modules') and env['QT_DIR_NAME']=='QT4DIR':
-    env['scons'].EnableQt4Modules(c['qt4modules'])
+  if c.has_key('qt4modules') and env['QT_TOOL']=='qt4':
+    env['prj_env'].EnableQt4Modules(c['qt4modules'])
+    # addPaths = [os.path.abspath(os.path.join(env['QT_DIR'], 'include', x)) for x in c['qt4modules']]
     if doBuildUI:
       qtuisrc = []
       if c.has_key('qt4ui'):
         qtuisrc = PrefixSources(env, '', c['qt4ui'])
       for s in qtuisrc:
-        env['scons'].Uic4(s)
+        env['prj_env'].Uic4(s)
+  # return addPaths
 
 def funcInclDeps(env):
   return
@@ -110,13 +114,14 @@ def DefaultLibraryConfig(env, c):
 
   #START!
   initEnv(env, c['PROG_NAME'])
-  
+
+  enableQtModules(env,c,True)
   env['prj_env'].Append( 
     CPPPATH = c['CPPPATH'],
     CPPDEFINES = c['CPPDEFINES']+LIB_DEFINES+STATIC_DEFINES
   )
   c['inclDeps'+DepsFunc](env)
-  enableQtModules(env,c,True)
+  
   env['scons'].Default(PrefixLibrary(env, 'src', c['sourceFiles']))
 
   if c.has_key('testFiles'):
@@ -138,6 +143,8 @@ def DefaultLibraryConfig(env, c):
     #       SHARED RUN
     initEnv(env, c['PROG_NAME']+"_run")
     
+
+    enableQtModules(env,c,False)
     env['prj_env'].Append(
       CPPPATH = c['CPPPATH'],
       CPPDEFINES = c['CPPDEFINES']+STATIC_DEFINES
@@ -146,7 +153,7 @@ def DefaultLibraryConfig(env, c):
     
     c['inclDeps'+DepsFunc+'_run'](env)
     c['inclDeps'+DepsFunc](env)
-    enableQtModules(env,c,False)
+    
     env['scons'].Default(PrefixProgram(env, 'src', c['runFiles']))
 
   env['SHARED'] = SHARED_VAR_BCP

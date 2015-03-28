@@ -69,17 +69,11 @@ def prepare_env(ARGUMENTS):
         print "WARNING: compiler was not specified, using default parameters"
         env = prepare_default(env)      
     elif env['COMPILER'] == 'gpp':
-        env = prepare_gpp(env,False,False,False)
+        env = prepare_gpp(env,False,False)
     elif env['COMPILER'] == 'gppwarn':
-        env = prepare_gpp(env,False,True,False)
+        env = prepare_gpp(env,True,False)
     elif env['COMPILER'] == 'gppwarnerr':
-        env = prepare_gpp(env,False,True,True) 
-    elif env['COMPILER'] == 'gppqt5':
-        env = prepare_gpp(env,True,False,False)
-    elif env['COMPILER'] == 'gppqt5warn':
-        env = prepare_gpp(env,True,True,False)  
-    elif env['COMPILER'] == 'gppqt5warnerr':
-        env = prepare_gpp(env,True,True,True)
+        env = prepare_gpp(env,True,True) 
     elif env['COMPILER'] == 'gcc':
         env = prepare_gcc(env)
     elif env['COMPILER'] == 'mingw':
