@@ -22,13 +22,13 @@ env['scons'] = Environment(
 
 verbosity =  int(env['VERBOSE'])
 if verbosity == 0:
-    env['scons']['CCCOMSTR'] = "Compiling $TARGET"
-    env['scons']['CXXCOMSTR'] = "Compiling $TARGET"
+    env['scons']['CCCOMSTR'] = "Compiling $SOURCES"
+    env['scons']['CXXCOMSTR'] = "Compiling $SOURCES"
     env['scons']['LINKCOMSTR'] = "Linking $TARGET"
     env['scons']['ARCOMSTR'] = "Archieving $TARGET"
 elif verbosity == 1:
-    env['scons']['CCCOMSTR'] = "Compiling $TARGET $CCFLAGS"
-    env['scons']['CXXCOMSTR'] = "Compiling $TARGET $CCFLAGS"
+    env['scons']['CCCOMSTR'] = "Compiling $TARGET $SOURCES"
+    env['scons']['CXXCOMSTR'] = "Compiling $TARGET $SOURCES"
     env['scons']['LINKCOMSTR'] = "Linking $TARGET $LINKFLAGS"
     env['scons']['ARCOMSTR'] = "Archieving $TARGET $LINKFLAGS"
 else:
