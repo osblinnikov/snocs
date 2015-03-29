@@ -28,7 +28,7 @@ def prepare_env(ARGUMENTS, ARGLIST):
     env['COMPILER'] = ARGUMENTS.get('compiler', 'gcc')
     env['PLATFORM'] = ARGUMENTS.get('platform', 'x86')
     env['LINKER'] = ARGUMENTS.get('linker', 'ld')
-    env['WITHOUT'] = ARGUMENTS.get('without', '').split(':')
+    env['WITHOUT'] = findArgs(ARGLIST,'without')
 
     if env['SNOCSCRIPT'] == None or env['SNOCSCRIPT']=="":
         print "SNocscript is not specified!"
@@ -44,12 +44,12 @@ def prepare_env(ARGUMENTS, ARGLIST):
 
 
     #--------deploy parameters--------
-    env['INSTALL_BIN_PATH'] = os.getenv('SNOCS_INSTALL_BIN_PATH', os.path.abspath(os.path.join(PROJECTS_SRC_PATH,'..','bin')))
-    env['INSTALL_LIB_PATH'] = os.getenv('SNOCS_INSTALL_LIB_PATH', os.path.abspath(os.path.join(PROJECTS_SRC_PATH,'..','lib')))
+    env['INSTALL_BIN_PATH'] = os.getenv('SNOCS_INSTALL_BIN_PATH', os.path.abspath(os.path.join(PROJECTS_SRC_PATH,'build','bin')))
+    env['INSTALL_LIB_PATH'] = os.getenv('SNOCS_INSTALL_LIB_PATH', os.path.abspath(os.path.join(PROJECTS_SRC_PATH,'build','lib')))
     env['PROJECTS_SRC_PATH'] = PROJECTS_SRC_PATH
     env['INSTALL_ALIASES'] = [] #here will be the targets for install alias
     env['TEST_ALIASES'] = [] #here will be the targets for test alias
-    env['ARCHITECTURE_CODE'] = '_'+env['COMPILER']+'_'+env['PLATFORM']
+    env['ARCHITECTURE_CODE'] = '_'+os.path.split(env['COMPILER'])[-1].split(".")[0]+'_'+env['PLATFORM']
     #---------init params-----------
     env['MSVC_PDB'] = 0
     env['MSVC_VERSION'] = None
@@ -164,7 +164,7 @@ def printHelp():
     print "  -all      # execute for all dependent projects"
     print "  --more-warnings or more-warnings=1 # show as many warnings as possible"
     print "  --warnings-as-errors or warnings-as-errors=1 # treat warns as errors"
-    print "  --no-PROJECT1_PREFIX or without=PROJECT1_PREFIX:PROJECT2_PREFIX # disable projects compilation"
+    print "  --no-PROJECT1_PREFIX or without=PROJECT1_PREFIX without=PROJECT2_PREFIX # disable projects compilation"
     print "        PROJECT1_PREFIX must match to the begining of the project name."
     print "        PREFIX can start with *, it means that the name should contain this PREFIX"
     print "  cpppath=PATH_TO_INCLUDES1 cpppath=PATH_TO_INCLUDES2"
