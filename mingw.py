@@ -9,10 +9,10 @@ def prepare_mingw(env):
     env['LIBPATH'].extend([])
     if env['PLATFORM'] == 'x86':
         env['CCFLAGS'].extend(['-m32'])
-        env['LINKFLAGS'].extend(['-m32'])
+        env['LINKFLAGS'].extend(['-m32','ws2_32','-liphlpapi'])
     elif env['PLATFORM'] == 'x64':
         env['CCFLAGS'].extend(['-m64'])
-        env['LINKFLAGS'].extend(['-m64'])
+        env['LINKFLAGS'].extend(['-m64','ws2_32','-liphlpapi'])
     else:
         print "Unknown platform: "+env['PLATFORM']
         exit()

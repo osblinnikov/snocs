@@ -13,7 +13,6 @@ env['scons'] = Environment(
     LIBPATH = env['LIBPATH'],
     LIBS = env['LIBS'],
     LINKFLAGS = env['LINKFLAGS'],
-    # CC=env['CC'],
     CPPPATH = env['CPPPATH'],
     CPPDEFINES = env['CPPDEFINES'],
     CCFLAGS = env['CCFLAGS'],
@@ -38,6 +37,8 @@ else:
 
 if env.has_key('CC') and env['CC'] != None:
     env['scons'].Replace(CC=env['CC'])
+if env.has_key('CXX') and env['CXX'] != None:
+    env['scons'].Replace(CXX=env['CXX'])
 if env.has_key('LINK') and env['LINK'] != None:
     env['scons'].Replace(LINK=env['LINK'])
 

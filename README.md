@@ -36,7 +36,7 @@ relative to workspace sources root directory e.g.:
 
 Available SNocs options:
 
-    compiler={gcc,gpp,gpp_cpp11,gppqt5,mingw,vc9,vc10,vc11,vc11exp}
+    compiler={gcc,g++,mingw,clang++,vc9,vc9exp,vc10,vc10exp,vc11,vc11exp}
     configuration={Debug,Release}
     platform={x86,Win32,x64} # Win32 is an alias to x86
     verbose=1 # enables scons debug output
@@ -49,7 +49,7 @@ Available SNocs options:
     --warnings-as-errors or warnings-as-errors=1  # treat warns as errors"
     --no-PROJECT1_PREFIX or without=PROJECT1_PREFIX without=PROJECT2_PREFIX # disable projects compilation. PROJECT1_PREFIX must match to the begining of the project name. PREFIX can start with *, it means that the name should contain this PREFIX"
     cpppath=PATH_TO_INCLUDES1 cpppath=PATH_TO_INCLUDES2
-    define="DEFINITION1 100" define=DEFINE2
+    define="DEFINITION1=100" define=DEFINE2
     libpath=PATH_TO_LIBRARIES
     lib=ADDITIONAL_LIBRARY_NAME
     cflag=FLAG1 cflag=FLAG2 cflag=FLAG3 #Compile flags

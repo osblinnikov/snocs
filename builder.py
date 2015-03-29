@@ -8,6 +8,7 @@ from gcc import *
 from mingw import *
 from default import *
 from vc9 import *
+from clangpp import *
 
 #PLEASE change it if you don't want the standard snocs location
 PROJECTS_SRC_PATH = os.getenv('SNOCS_PROJECTS_SRC_PATH', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
@@ -68,24 +69,23 @@ def prepare_env(ARGUMENTS, ARGLIST):
     if env['COMPILER'] == 'default':
         print "WARNING: compiler was not specified, using default parameters"
         env = prepare_default(env)      
-    elif env['COMPILER'] == 'gpp':
+    elif env['COMPILER'] == 'g++':
         env = prepare_gpp(env)
     elif env['COMPILER'] == 'gcc':
         env = prepare_gcc(env)
+    elif env['COMPILER'] == 'clang++':
+        env = prepare_clangpp(env)        
     elif env['COMPILER'] == 'mingw':
         env = prepare_mingw(env)
-    elif env['COMPILER'] == 'vc9':
+    elif env['COMPILER'].startswith('vc'):
         env = prepare_vc9(env)
-        env['MSVC_VERSION'] = '9.0'
-    elif env['COMPILER'] == 'vc10':
-        env = prepare_vc9(env)
-        env['MSVC_VERSION'] = '10.0'
-    elif env['COMPILER'] == 'vc11':
-        env = prepare_vc9(env)
-        env['MSVC_VERSION'] = '11.0'
-    elif env['COMPILER'] == 'vc11exp':
-        env = prepare_vc9(env)
-        env['MSVC_VERSION'] = '11.0Exp'
+        compiler = env['COMPILER'][2:]
+        if compiler.endswith('exp'):
+            Exp = 'Exp'
+        else:
+            Exp = ''
+        compiler = compiler.replace('exp','')
+        env['MSVC_VERSION'] = compiler+'.0'+Exp
     else:
         print "---Custom---"        
         env['TOOLS'] = ['default']
@@ -152,7 +152,7 @@ def printHelp():
     print "  snocs example compiler=vc9 test"
     print "**********************"
     print "Available options:"
-    print "  compiler={gcc,gpp,mingw,vc9,vc10,vc11,vc11exp}"
+    print "  compiler={gcc,g++,mingw,clang++,vc9,vc9exp,vc10,vc10exp,vc11,vc11exp}"
     print "  configuration={Debug,Release}"
     print "  platform={x86,Win32,x64} # Win32 is an alias to x86"
     print "  verbose=0|1|2 # enables scons debug output"
@@ -168,7 +168,7 @@ def printHelp():
     print "        PROJECT1_PREFIX must match to the begining of the project name."
     print "        PREFIX can start with *, it means that the name should contain this PREFIX"
     print "  cpppath=PATH_TO_INCLUDES1 cpppath=PATH_TO_INCLUDES2"
-    print "  define=\"DEFINITION1 100\" define=DEFINE2"
+    print "  define=\"DEFINITION1=100\" define=DEFINE2"
     print "  libpath=PATH_TO_LIBRARIES"
     print "  lib=ADDITIONAL_LIBRARY_NAME"
     print "  cflag=FLAG1 cflag=FLAG2 cflag=FLAG3 #Compile flags"
