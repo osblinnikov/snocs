@@ -43,8 +43,11 @@ def main(argv):
             exit()
         
     OTHER_ARGUMENTS = ""
+    MORE_WARNINGS = 0
+    WARNINGS_AS_ERRORS = 0
     ALL_PROJECTS = 0
     CLEANING_STAGE = 0
+    SKIP_PROJECT_NAMES = []
     if len(argv) > firstRealArgI + 1:
         for i in range(firstRealArgI+1, len(argv)):
             if argv[i] == '-h':
@@ -58,8 +61,22 @@ def main(argv):
                 print "* Will make the dependencies"
                 ALL_PROJECTS = 1
                 continue
+            elif argv[i] == '--more-warnings':
+                MORE_WARNINGS = 1
+                continue
+            elif argv[i] == '--warnings-as-errors':
+                WARNINGS_AS_ERRORS = 1
+                continue
+            elif argv[i].startswith('--no-') and len(argv[i])>5:
+                SKIP_PROJECT_NAMES += [argv[i][5:]]
+                continue
+            elif argv[i].startswith('without=') and len(argv[i])>8:
+                SKIP_PROJECT_NAMES += argv[i][8:].split(":")
             elif argv[i] == '-c':
                 CLEANING_STAGE = 1
+            if ' ' in argv[i] and '=' in argv[i]:
+                s = argv[i].split('=')
+                argv[i] = s[0]+"=\""+s[1]+"\""
             OTHER_ARGUMENTS+=" "+argv[i]
         #end for arguments
         
@@ -67,9 +84,14 @@ def main(argv):
         OTHER_ARGUMENTS +=" build_all=1"
     if CLEANING_STAGE == 1:
         OTHER_ARGUMENTS +=" cleaning=1"
-
+    if WARNINGS_AS_ERRORS == 1:
+        OTHER_ARGUMENTS +=" warnings-as-errors=1"
+    if MORE_WARNINGS == 1:
+        OTHER_ARGUMENTS +=" more-warnings=1"
+    if len(SKIP_PROJECT_NAMES) > 0:
+        OTHER_ARGUMENTS +=" without="+(':'.join(SKIP_PROJECT_NAMES)) 
     snocsStr = "scons -f "+os.path.abspath(os.path.dirname(__file__))+"/SNocstruct snocscript="+SNocscript+OTHER_ARGUMENTS
-    # print snocsStr
+    print snocsStr
     os.system(snocsStr)
 
 

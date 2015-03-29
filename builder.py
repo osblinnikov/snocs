@@ -12,7 +12,7 @@ from vc9 import *
 #PLEASE change it if you don't want the standard snocs location
 PROJECTS_SRC_PATH = os.getenv('SNOCS_PROJECTS_SRC_PATH', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
 
-def prepare_env(ARGUMENTS):
+def prepare_env(ARGUMENTS, ARGLIST):
     #--------command line arguments------------
     env = {}
     for k,v in ARGUMENTS.iteritems():
@@ -26,9 +26,9 @@ def prepare_env(ARGUMENTS):
     env['SNOCSCRIPT'] = ARGUMENTS.get('snocscript', None)
     env['CONFIGURATION'] = ARGUMENTS.get('configuration', 'Release')
     env['COMPILER'] = ARGUMENTS.get('compiler', 'gcc')
-    env['TARGET_ARCH'] = env['PLATFORM'] = ARGUMENTS.get('platform', 'x86')
+    env['PLATFORM'] = ARGUMENTS.get('platform', 'x86')
     env['LINKER'] = ARGUMENTS.get('linker', 'ld')
-    env['WITHOUT'] = ARGUMENTS.get('WITHOUT', '').split(':')
+    env['WITHOUT'] = ARGUMENTS.get('without', '').split(':')
 
     if env['SNOCSCRIPT'] == None or env['SNOCSCRIPT']=="":
         print "SNocscript is not specified!"
@@ -69,11 +69,7 @@ def prepare_env(ARGUMENTS):
         print "WARNING: compiler was not specified, using default parameters"
         env = prepare_default(env)      
     elif env['COMPILER'] == 'gpp':
-        env = prepare_gpp(env,False,False)
-    elif env['COMPILER'] == 'gppwarn':
-        env = prepare_gpp(env,True,False)
-    elif env['COMPILER'] == 'gppwarnerr':
-        env = prepare_gpp(env,True,True) 
+        env = prepare_gpp(env)
     elif env['COMPILER'] == 'gcc':
         env = prepare_gcc(env)
     elif env['COMPILER'] == 'mingw':
@@ -98,15 +94,25 @@ def prepare_env(ARGUMENTS):
         print "compiler: "+env['CC']
         print "linker: "+env['LINK']
 
-    env['CPPPATH'].extend(ARGUMENTS.get('CPPPATH', '').split(':'))
-    env['CPPDEFINES'].extend(ARGUMENTS.get('CPPDEFINES', '').split(':'))
-    env['CCFLAGS'].extend(ARGUMENTS.get('CCFLAGS', '').split(':'))
-    env['LINKFLAGS'].extend(ARGUMENTS.get('LINKFLAGS', '').split(':'))
-    env['LIBPATH'].extend(ARGUMENTS.get('LIBPATH', '').split(':'))
-    env['LIBS'].extend(ARGUMENTS.get('LIBS', '').split(':'))
+    env['CPPPATH'].extend(findArgs(ARGLIST,'cpppath'))
+    env['CPPDEFINES'].extend(findArgs(ARGLIST,'define'))
+    env['CCFLAGS'].extend(findArgs(ARGLIST,'cflag'))
+    env['LINKFLAGS'].extend(findArgs(ARGLIST,'lflag'))
+    env['LIBPATH'].extend(findArgs(ARGLIST,'libpath'))
+    env['LIBS'].extend(findArgs(ARGLIST,'lib'))
     env['bcp'] = copy.deepcopy(env)
 
     return env
+
+def findArgs(ARGLIST, argName):
+    l = []
+    for key, value in ARGLIST:
+        if key.lower() == argName.lower():
+            l.append(value)
+    if len(l) > 0:
+        print argName+"s:"
+        print l
+    return l
 
 def builder_unit_test(target, source, env):
     d = env.Dictionary()
@@ -146,16 +152,27 @@ def printHelp():
     print "  snocs example compiler=vc9 test"
     print "**********************"
     print "Available options:"
-    print "  compiler={gcc,gpp,gppwarn,gppqt5,gppqt5warn,mingw,vc9,vc10,vc11,vc11exp}"
+    print "  compiler={gcc,gpp,mingw,vc9,vc10,vc11,vc11exp}"
     print "  configuration={Debug,Release}"
     print "  platform={x86,Win32,x64} # Win32 is an alias to x86"
-    print "  verbose=1 # enables scons debug output"
-    print "  shared=1 | 0 #enables building shared libraries for all projects of default config"
-    print "  testnorun=0 | 1 #disables tests run in case of test/install targets"
+    print "  verbose=0|1|2 # enables scons debug output"
+    print "  shared=1|0 #enables building shared libraries for all projects of default config"
+    print "  testnorun=0|1 #disables tests run in case of test/install targets"
     print "  -r        # execute SNocscriptFilePath/SNocscript as Python script"
     print "  -h        # print this help"
     print "  -c        # execute cleaning"
     print "  -all      # execute for all dependent projects"
+    print "  --more-warnings or more-warnings=1 # show as many warnings as possible"
+    print "  --warnings-as-errors or warnings-as-errors=1 # treat warns as errors"
+    print "  --no-PROJECT1_PREFIX or without=PROJECT1_PREFIX:PROJECT2_PREFIX # disable projects compilation"
+    print "        PROJECT1_PREFIX must match to the begining of the project name."
+    print "        PREFIX can start with *, it means that the name should contain this PREFIX"
+    print "  cpppath=PATH_TO_INCLUDES1 cpppath=PATH_TO_INCLUDES2"
+    print "  define=\"DEFINITION1 100\" define=DEFINE2"
+    print "  libpath=PATH_TO_LIBRARIES"
+    print "  lib=ADDITIONAL_LIBRARY_NAME"
+    print "  cflag=FLAG1 cflag=FLAG2 cflag=FLAG3 #Compile flags"
+    print "  lflag=FLAG1 lflag=FLAG2 lflag=FLAG3 #Link flags"
     print "**********************"
     print "Other options can be SCons specific."
     print "  If you want to change default path to the sources then"

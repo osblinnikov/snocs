@@ -3,30 +3,31 @@ import sys
 import string
 
 
-def prepare_gpp(env, morewarns, warnaserr):
-    additionalCCFLAGS = []
+def prepare_gpp(env):
+    
 
     env['CC'] = 'g++'
     env['TOOLS'] = ['default']
-    env['QT_TOOL'] = os.environ.get("QT_TOOL", "False")
-    if env['QT_TOOL'] != False:
-        if env['QT_TOOL'] == 'qt5':
+    env['QTVER'] = os.environ.get("QTVER", False)
+    if env['QTVER'] != False:
+        if env['QTVER'].startswith('5'):
           env['QT_DIR_NAME'] = 'QT5DIR'
-        elif env['QT_TOOL'] == 'qt4':
+          env['QT_TOOL'] = 'qt5'
+        elif env['QTVER'].startswith('4'):
           env['QT_DIR_NAME'] = 'QT4DIR'
+          env['QT_TOOL'] = 'qt4'
         else:
-          print 'Unknown QT_TOOL '+env['QT_TOOL']
+          print 'Unknown QTVER '+env['QTVER']+" only started with 4 or 5 is allowed"
           Exit(1)
-        env['QT_DIR'] = detectLatestQtDir(env['PLATFORM'])
-        if not os.path.exists(env['QT_DIR']):
-            print 'either QTDIR environment variable is not set or '+env['QT_DIR']+" is not exists"
-            Exit(1)
+        env['QT_DIR'] = detectLatestQtDir(env['PLATFORM'],env['QTVER'])
         env['QT_PKG_CONFIG_PATH'] = os.path.join(env['QT_DIR'], 'lib/pkgconfig')
 
-    if morewarns:
+
+    additionalCCFLAGS = []
+    if env.has_key('more-warnings') and env['more-warnings'] == '1':
         additionalCCFLAGS += warnFlags
 
-    if warnaserr:
+    if env.has_key('warnings-as-errors') and env['warnings-as-errors'] == '1':
         additionalCCFLAGS += '-Werror'
 
     env['CPPPATH'].extend([])
@@ -76,15 +77,21 @@ def get_immediate_subdirectories(dir):
     else:
         return []
 
-def detectLatestQtDir(platform):
-    if platform == 'x86':
-        if sys.platform.startswith("linux"):
-            return os.environ.get("QTDIR",os.path.expanduser("~/Qt-x86/5.3/gcc"))
-        else:
-            return os.environ.get("QTDIR","C:\\Qt\\5.3\\mingw")
-    elif platform == 'x64':
-        if sys.platform.startswith("linux"):
-            return os.environ.get("QTDIR",os.path.expanduser("~/Qt/5.3/gcc_64"))
-        else:
-            return os.environ.get("QTDIR","C:\\Qt\\5.3\\mingw")
+def detectLatestQtDir(platform,QTVER):
+  QTDIR = os.environ.get("QTDIR",'')
+  if len(QTDIR) == 0:
+    if sys.platform.startswith("linux"):
+      if platform == 'x86':
+        QTDIR = os.path.expanduser("~/Qt-x86/"+QTVER+"/gcc")
+      else:
+        QTDIR = os.path.expanduser("~/Qt/"+QTVER+"/gcc_64")
+    elif sys.platform.startswith("windows"):
+      QTDIR = "C:\\Qt\\"+QTVER+"\\mingw"
+    else:
+      print "gpp.detectLatestQtDir(): QTDIR env variable is not set and OS "+sys.platform+" is unknown"
+  
+  if not os.path.exists(QTDIR):
+    print 'gpp.detectLatestQtDir(): QTDIR='+QTDIR+" not exists"
+    Exit(1)
+  return QTDIR
 

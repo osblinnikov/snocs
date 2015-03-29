@@ -2,7 +2,7 @@ import os.path
 import sys
 from builder import *
 
-env = prepare_env(ARGUMENTS)
+env = prepare_env(ARGUMENTS, ARGLIST)
 
 env['scons'] = Environment(
     TESTNORUN = env['TESTNORUN'],

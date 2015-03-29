@@ -7,14 +7,14 @@ def prepare_default(env):
     env['CPPPATH'].extend([])
     env['CPPDEFINES'].extend([])
     env['LIBPATH'].extend([])
-    if env['TARGET_ARCH'] == 'x86':
+    if env['PLATFORM'] == 'x86':
         env['CCFLAGS'].extend([])
         env['LINKFLAGS'].extend([])
-    elif env['TARGET_ARCH'] == 'x64':
+    elif env['PLATFORM'] == 'x64':
         env['CCFLAGS'].extend([])
         env['LINKFLAGS'].extend([])
     else:
-        print "Unknown architecture: "+env['TARGET_ARCH']
+        print "Unknown platform: "+env['PLATFORM']
         exit()
     if env['configuration'] == 'Debug':
         env['CCFLAGS'].extend([])

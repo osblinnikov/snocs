@@ -158,8 +158,21 @@ def DefaultLibraryConfig(env, c):
 
   env['SHARED'] = SHARED_VAR_BCP
 
+def isProjectDisabled(env):
+  # print env['WITHOUT']
+  for fltr in env['WITHOUT']:
+    if len(fltr) == 0:
+      return
+    if env['PROG_NAME'].startswith(fltr):
+      print "env['PROG_NAME']="+env['PROG_NAME']+" startswith "+fltr
+      return True
+    if fltr.startswith("*") and (fltr in env['PROG_NAME']):
+      print "fltr "+fltr+" in "+env['PROG_NAME']
+      return True
+  return False
+
 def PrefixProgram(env, folder, srcs):
-  if env['PROG_NAME'] in env['WITHOUT']:
+  if isProjectDisabled(env):
     return
   folder = os.path.abspath(os.path.join(env['SNOCSCRIPT_PATH'],folder))
   trgt = env['PROG_NAME']
@@ -187,8 +200,8 @@ def PrefixProgram(env, folder, srcs):
   return env['APP_BUILD'][targetFullPath]
 
 def PrefixTest(env, folder, srcs):
-  if env['PROG_NAME'] in env['WITHOUT']:
-    return  
+  if isProjectDisabled(env):
+    return
   folder = os.path.abspath(os.path.join(env['SNOCSCRIPT_PATH'],folder))
   trgt = env['PROG_NAME']
   if env['SHARED'] == '0':
@@ -214,8 +227,8 @@ def PrefixTest(env, folder, srcs):
 
 # Similar to PrefixProgram above, except for Library
 def PrefixLibrary(env, folder, srcs):
-  if env['PROG_NAME'] in env['WITHOUT']:
-    return  
+  if isProjectDisabled(env):
+    return
   folder = os.path.abspath(os.path.join(env['SNOCSCRIPT_PATH'],folder))
   trgt = env['PROG_NAME']
   if env['SHARED'] == '0':
@@ -234,8 +247,8 @@ def PrefixLibrary(env, folder, srcs):
   
 # Similar to PrefixProgram above, except for SharedLibrary
 def PrefixSharedLibrary(env, folder, srcs):
-  if env['PROG_NAME'] in env['WITHOUT']:
-    return  
+  if isProjectDisabled(env):
+    return
   folder = os.path.abspath(os.path.join(env['SNOCSCRIPT_PATH'],folder))
   trgt = env['PROG_NAME']
   if env['SHARED'] == '0':

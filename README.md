@@ -45,6 +45,15 @@ Available SNocs options:
     -r        # execute SNocscriptFilePath/SNocscript as Python script without SCons
     -c        # execute cleaning
     -all      # execute for all dependent projects
+    --more-warnings or more-warnings=1            # show as many warnings as possible"
+    --warnings-as-errors or warnings-as-errors=1  # treat warns as errors"
+    --no-PROJECT1_PREFIX or without=PROJECT1_PREFIX:PROJECT2_PREFIX # disable projects compilation. PROJECT1_PREFIX must match to the begining of the project name. PREFIX can start with *, it means that the name should contain this PREFIX"
+    cpppath=PATH_TO_INCLUDES1 cpppath=PATH_TO_INCLUDES2
+    define="DEFINITION1 100" define=DEFINE2
+    libpath=PATH_TO_LIBRARIES
+    lib=ADDITIONAL_LIBRARY_NAME
+    cflag=FLAG1 cflag=FLAG2 cflag=FLAG3 #Compile flags
+    lflag=FLAG1 lflag=FLAG2 lflag=FLAG3 #Link flags
 
 Available targets:
 
