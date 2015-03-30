@@ -198,7 +198,7 @@ def PrefixProgram(env, folder, srcs):
     env['prj_env'].Append(PDB = os.path.join( env['BIN_DIR'], trgt + env['ARCHITECTURE_CODE'] + '.pdb' ))
   targetFullPath = os.path.join(env['SNOCSCRIPT_PATH'],trgt + env['ARCHITECTURE_CODE'])
   targetFullPathToBin = os.path.join(env['BIN_DIR'],trgt+env['ARCHITECTURE_CODE'])
-  print srcs
+  # print srcs
   env['APP_BUILD'][targetFullPath] = env['prj_env'].Program(
     target = targetFullPathToBin, 
     source = srcs, 
