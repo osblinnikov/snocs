@@ -88,8 +88,9 @@ def main(argv):
         OTHER_ARGUMENTS +=" warnings-as-errors=1"
     if MORE_WARNINGS == 1:
         OTHER_ARGUMENTS +=" more-warnings=1"
-    if len(SKIP_PROJECT_NAMES) > 0:
-        OTHER_ARGUMENTS +=" without="+(':'.join(SKIP_PROJECT_NAMES)) 
+    for name in SKIP_PROJECT_NAMES:
+        OTHER_ARGUMENTS +=" without="+name
+        # OTHER_ARGUMENTS +=" without="+(':'.join(SKIP_PROJECT_NAMES)) 
     snocsStr = "scons -f "+os.path.abspath(os.path.dirname(__file__))+"/SNocstruct snocscript="+SNocscript+OTHER_ARGUMENTS
     print snocsStr
     os.system(snocsStr)
