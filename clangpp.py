@@ -8,27 +8,27 @@ def prepare_clangpp(env):
     env['TOOLS'] = ['default']
     env['CPPPATH'].extend([])
     env['CPPDEFINES'].extend([])
-    additionalCCFLAGS = []
+    additionalCPPFLAGS = []
     if env.has_key('more-warnings') and env['more-warnings'] == '1':
-        additionalCCFLAGS += warnFlags
+        additionalCPPFLAGS += warnFlags
 
     if env.has_key('warnings-as-errors') and env['warnings-as-errors'] == '1':
-        additionalCCFLAGS += '-Werror'
+        additionalCPPFLAGS += '-Werror'
 
     if env['PLATFORM'] == 'x86':
-        env['CCFLAGS'].extend(['-m32','-std=c++11','-stdlib=libc++']+additionalCCFLAGS)
+        env['CPPFLAGS'].extend(['-m32','-std=c++11','-stdlib=libc++']+additionalCPPFLAGS)
         env['LINKFLAGS'].extend(['-m32','-stdlib=libc++'])
         env['LIBS'].extend([])
         env['LIBPATH'].extend(['/usr/lib32'])
     elif env['PLATFORM'] == 'x64':
-        env['CCFLAGS'].extend(['-m64','-std=c++11','-stdlib=libc++']+additionalCCFLAGS)
+        env['CPPFLAGS'].extend(['-m64','-std=c++11','-stdlib=libc++']+additionalCPPFLAGS)
         env['LINKFLAGS'].extend(['-m64','-stdlib=libc++'])
         env['LIBPATH'].extend(['/usr/local/lib64'])
     else:
         print "Unknown platform: "+env['PLATFORM']
         exit()
     if env['CONFIGURATION'] == 'Debug':
-        env['CCFLAGS'].extend(['-g'])
+        env['CPPFLAGS'].extend(['-g'])
     return env
 
 

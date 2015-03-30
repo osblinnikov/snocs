@@ -206,7 +206,7 @@ class _Automoc:
             
             # Now, check whether the corresponding CPP file
             # includes the moc'ed output directly...
-            inc_moc_cpp = r'^\s*#\s*include\s+"%s"' % str(moc_cpp[0])
+            inc_moc_cpp = r'^\s*#\s*include\s+"%s"' % str(moc_cpp[0]).replace("+","\\+")
             if cpp and re.search(inc_moc_cpp, cpp_contents, re.M):
                 if moc_options['debug']:
                     print "scons: qt4: CXX file '%s' directly includes the moc'ed output '%s', no compiling required" % (str(cpp), str(moc_cpp))
@@ -240,8 +240,8 @@ class _Automoc:
             cxx_moc = "%s%s%s" % (env.subst('$QT4_XMOCCXXPREFIX'),
                                   self.splitext(cpp.name)[0],
                                   env.subst('$QT4_XMOCCXXSUFFIX'))
-            inc_h_moc = r'#include\s+"%s"' % h_moc
-            inc_cxx_moc = r'#include\s+"%s"' % cxx_moc
+            inc_h_moc = r'#include\s+"%s"' % h_moc.replace("+","\\+")
+            inc_cxx_moc = r'#include\s+"%s"' % cxx_moc.replace("+","\\+")
             
             # Search for special includes in qtsolutions style
             if cpp and re.search(inc_h_moc, cpp_contents):

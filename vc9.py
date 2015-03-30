@@ -32,7 +32,7 @@ def prepare_vc9(env):
             '_DEBUG',
             '_CONSOLE'
         ])
-        env['CCFLAGS'].extend(['/W4','/EHsc','/RTC1','/MDd','/nologo','/Z7','/TP','/errorReport:prompt'])
+        env['CPPFLAGS'].extend(['/W4','/EHsc','/RTC1','/MDd','/nologo','/Z7','/TP','/errorReport:prompt'])
         env['MSVC_PDB'] = 1
     else:
         env['LINKFLAGS'].extend(['/NOLOGO','/SUBSYSTEM:CONSOLE','/MACHINE:'+env['TARGET_ARCH'].upper()])
@@ -41,6 +41,6 @@ def prepare_vc9(env):
             'NDEBUG',
             '_CONSOLE'
         ])
-        env['CCFLAGS'].extend(['/W4','/EHsc','/RTC1','/MD','/nologo','/Z7','/TP','/errorReport:prompt'])
+        env['CPPFLAGS'].extend(['/W4','/EHsc','/RTC1','/MD','/nologo','/Z7','/TP','/errorReport:prompt'])
         
     return env

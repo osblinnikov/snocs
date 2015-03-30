@@ -31,6 +31,9 @@ def DefaultParentConfig(env,c):
 def enableQtModules(env,c, doBuildUI):
   # addPaths = []
   if c.has_key('qt5modules') and env['QT_TOOL']=='qt5':
+    env['prj_env'][env['QT_DIR_NAME']] = env['QT_DIR']
+    env['prj_env'].AppendENVPath('PKG_CONFIG_PATH', env['QT_PKG_CONFIG_PATH'])
+    env['prj_env'].Tool(env['QT_TOOL'])
     env['prj_env'].EnableQt5Modules(c['qt5modules'])
     # addPaths = [os.path.abspath(os.path.join(env['QT_DIR'], 'include', x)) for x in c['qt5modules']]
     if doBuildUI:
@@ -42,6 +45,9 @@ def enableQtModules(env,c, doBuildUI):
         env['prj_env'].Uic5(s)
 
   if c.has_key('qt4modules') and env['QT_TOOL']=='qt4':
+    env['prj_env'][env['QT_DIR_NAME']] = env['QT_DIR']
+    env['prj_env'].AppendENVPath('PKG_CONFIG_PATH', env['QT_PKG_CONFIG_PATH'])
+    env['prj_env'].Tool(env['QT_TOOL'])
     env['prj_env'].EnableQt4Modules(c['qt4modules'])
     # addPaths = [os.path.abspath(os.path.join(env['QT_DIR'], 'include', x)) for x in c['qt4modules']]
     if doBuildUI:
@@ -104,6 +110,8 @@ def DefaultLibraryConfig(env, c):
       c['sourceFiles'] = []
       srcFolder = os.path.join(env['SNOCSCRIPT_PATH'],'src')
       for root, dirs, files in os.walk(srcFolder):
+        if root.endswith('.tmp'):
+          continue
         for fileName in files:
           if fileName == 'main.cpp' or fileName == 'main.c':
             continue
@@ -183,17 +191,18 @@ def PrefixProgram(env, folder, srcs):
   env['prj_env'].VariantDir(folder_trgt, folder, duplicate=0)
   
   srcs = PrefixSources(env, folder_trgt, srcs)
-  linkom = None
+  linkom = []
   if env['MSVC_VERSION'] != None and float(env['MSVC_VERSION'].translate(None, 'Exp')) < 11:
-    linkom = 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;1'
+    linkom = ['mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;1']
   if env['MSVC_PDB']:
     env['prj_env'].Append(PDB = os.path.join( env['BIN_DIR'], trgt + env['ARCHITECTURE_CODE'] + '.pdb' ))
   targetFullPath = os.path.join(env['SNOCSCRIPT_PATH'],trgt + env['ARCHITECTURE_CODE'])
   targetFullPathToBin = os.path.join(env['BIN_DIR'],trgt+env['ARCHITECTURE_CODE'])
+  print srcs
   env['APP_BUILD'][targetFullPath] = env['prj_env'].Program(
     target = targetFullPathToBin, 
     source = srcs, 
-    LINKCOM  = [env['prj_env']['LINKCOM'], linkom]
+    LINKCOM  = [env['prj_env']['LINKCOM']]+linkom
   )
   env['INSTALL_ALIASES'].append(env['prj_env'].Install(env['INSTALL_BIN_PATH'], env['APP_BUILD'][targetFullPath]))#setup install directory
 
@@ -210,14 +219,14 @@ def PrefixTest(env, folder, srcs):
   env['prj_env'].VariantDir(folder_trgt, folder, duplicate=0)
 
   srcs = PrefixSources(env, folder_trgt, srcs)
-  linkom = None
+  linkom = []
   if env['MSVC_VERSION'] != None and float(env['MSVC_VERSION'].translate(None, 'Exp')) < 11:
-    linkom = 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;1'
+    linkom = ['mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;1']
   if env['MSVC_PDB']:
     env['prj_env'].Append(PDB = os.path.join( env['BIN_DIR'], trgt + env['ARCHITECTURE_CODE'] + '.pdb' ))
   targetFullPath = os.path.join(env['SNOCSCRIPT_PATH'],trgt + env['ARCHITECTURE_CODE'])
   targetFullPathToBin = os.path.join(env['BIN_DIR'],trgt+env['ARCHITECTURE_CODE'])
-  env['APP_BUILD'][targetFullPath] = env['prj_env'].Program(target = targetFullPathToBin, source = srcs, LINKCOM  = [env['prj_env']['LINKCOM'], linkom])
+  env['APP_BUILD'][targetFullPath] = env['prj_env'].Program(target = targetFullPathToBin, source = srcs, LINKCOM  = [env['prj_env']['LINKCOM']]+linkom)
   env['INSTALL_ALIASES'].append(env['prj_env'].Install(env['INSTALL_BIN_PATH'], env['APP_BUILD'][targetFullPath]))#setup install directory
 
   testPassedFullPath = os.path.join(env['SNOCSCRIPT_PATH'],env['CONFIGURATION'],'bin',trgt+env['ARCHITECTURE_CODE']+".passed")
@@ -257,14 +266,14 @@ def PrefixSharedLibrary(env, folder, srcs):
   env['prj_env'].VariantDir(folder_trgt, folder, duplicate=0)
   
   srcs = PrefixSources(env, folder_trgt, srcs)
-  linkom = None
+  linkom = []
   if env['MSVC_VERSION'] != None and float(env['MSVC_VERSION'].translate(None, 'Exp')) < 11:
-    linkom = 'mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2'
+    linkom = ['mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2']
   if env['MSVC_PDB']:
     env['prj_env'].Append(PDB = os.path.join( env['LIB_DIR'], trgt+env['ARCHITECTURE_CODE'] + '.pdb' ))
   targetFullPath = os.path.join(env['SNOCSCRIPT_PATH'],trgt+env['ARCHITECTURE_CODE'])
   targetFullPathToBin = os.path.join(env['LIB_DIR'],trgt+env['ARCHITECTURE_CODE'])
-  env['APP_BUILD'][targetFullPath] = env['prj_env'].SharedLibrary(target = targetFullPathToBin, source = srcs, LINKCOM  = [env['prj_env']['LINKCOM'], linkom]) 
+  env['APP_BUILD'][targetFullPath] = env['prj_env'].SharedLibrary(target = targetFullPathToBin, source = srcs, LINKCOM  = [env['prj_env']['LINKCOM']]+linkom) 
   env['INSTALL_ALIASES'].append(env['prj_env'].Install(env['INSTALL_LIB_PATH'], env['APP_BUILD'][targetFullPath]))#setup install directory
   return env['APP_BUILD'][targetFullPath]
 

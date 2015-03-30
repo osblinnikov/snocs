@@ -15,7 +15,6 @@ env['scons'] = Environment(
     LINKFLAGS = env['LINKFLAGS'],
     CPPPATH = env['CPPPATH'],
     CPPDEFINES = env['CPPDEFINES'],
-    CCFLAGS = env['CCFLAGS'],
     ENV = os.environ
 )
 
@@ -34,22 +33,22 @@ else:
     Progress('Evaluating $TARGET\n')
 
         
-
+if env.has_key('CCFLAGS') and env['CCFLAGS'] != None:
+    env['scons'].Replace(CCFLAGS=env['CCFLAGS'])
 if env.has_key('CC') and env['CC'] != None:
     env['scons'].Replace(CC=env['CC'])
 if env.has_key('CXX') and env['CXX'] != None:
     env['scons'].Replace(CXX=env['CXX'])
+if env.has_key('CXXFLAGS') and env['CXXFLAGS'] != None:
+    env['scons'].Replace(CXXFLAGS=env['CXXFLAGS'])
+if env.has_key('CPPFLAGS') and env['CPPFLAGS'] != None:
+    env['scons'].Replace(CPPFLAGS=env['CPPFLAGS'])    
 if env.has_key('LINK') and env['LINK'] != None:
     env['scons'].Replace(LINK=env['LINK'])
 
 env['scons'].AppendENVPath('LD_LIBRARY_PATH', env['INSTALL_LIB_PATH'])
 env['scons'].AppendENVPath('PATH', env['INSTALL_LIB_PATH'])
 env['scons'].AppendENVPath('PKG_CONFIG_PATH', os.path.join(env['INSTALL_LIB_PATH'],'pkgconfig'))
-
-if env.has_key('QT_DIR_NAME'):
-    env['scons'][env['QT_DIR_NAME']] = env['QT_DIR']
-    env['scons'].AppendENVPath('PKG_CONFIG_PATH', env['QT_PKG_CONFIG_PATH'])
-    env['scons'].Tool(env['QT_TOOL'])
                 
 # Progress('Evaluating $TARGET\n')
 env['scons'].Decider( 'MD5-timestamp' )          # For speed, use timestamps for change, followed by MD5

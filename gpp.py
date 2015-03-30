@@ -23,29 +23,29 @@ def prepare_gpp(env):
         env['QT_PKG_CONFIG_PATH'] = os.path.join(env['QT_DIR'], 'lib/pkgconfig')
 
 
-    additionalCCFLAGS = []
+    additionalCPPFLAGS = []
     if env.has_key('more-warnings') and env['more-warnings'] == '1':
-        additionalCCFLAGS += warnFlags
+        additionalCPPFLAGS += warnFlags
 
     if env.has_key('warnings-as-errors') and env['warnings-as-errors'] == '1':
-        additionalCCFLAGS += '-Werror'
+        additionalCPPFLAGS += '-Werror'
 
     env['CPPPATH'].extend([])
     env['CPPDEFINES'].extend([])
     if env['PLATFORM'] == 'x86':
-        env['CCFLAGS'].extend(['-m32','-fpic','-std=gnu++11']+additionalCCFLAGS)
+        env['CPPFLAGS'].extend(['-m32','-fpic','-std=gnu++11']+additionalCPPFLAGS)
         env['LINKFLAGS'].extend(['-m32'])
         env['LIBS'].extend([])#'stdc++'
         env['LIBPATH'].extend(['/usr/lib32'])
     elif env['PLATFORM'] == 'x64':
-        env['CCFLAGS'].extend(['-m64','-fpic','-std=gnu++11']+additionalCCFLAGS)
+        env['CPPFLAGS'].extend(['-m64','-fpic','-std=gnu++11']+additionalCPPFLAGS)
         env['LINKFLAGS'].extend(['-m64'])
         env['LIBPATH'].extend(['/usr/local/lib64'])
     else:
         print "Unknown platform: "+env['PLATFORM']
         exit()
     if env['CONFIGURATION'] == 'Debug':
-        env['CCFLAGS'].extend(['-g'])
+        env['CPPFLAGS'].extend(['-g'])
 
     return env
 
@@ -89,9 +89,10 @@ def detectLatestQtDir(platform,QTVER):
       QTDIR = "C:\\Qt\\"+QTVER+"\\mingw"
     else:
       print "gpp.detectLatestQtDir(): QTDIR env variable is not set and OS "+sys.platform+" is unknown"
-  
+  if QTDIR.startswith("~"):
+    QTDIR = os.path.expanduser(QTDIR)
   if not os.path.exists(QTDIR):
     print 'gpp.detectLatestQtDir(): QTDIR='+QTDIR+" not exists"
-    Exit(1)
+    sys.exit(1)
   return QTDIR
 

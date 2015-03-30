@@ -59,6 +59,8 @@ def prepare_env(ARGUMENTS, ARGLIST):
     env['TOOLS'] = 'default'
     env['LINKFLAGS'] = []
     env['CCFLAGS'] = []
+    env['CPPFLAGS'] = []
+    env['CXXFLAGS'] = []
     env['LIBS'] = []
     env['LIBPATH']=[]
     env['CPPPATH'] = [
@@ -68,13 +70,13 @@ def prepare_env(ARGUMENTS, ARGLIST):
     #--------SWITCHING COMPILER------
     if env['COMPILER'] == 'default':
         print "WARNING: compiler was not specified, using default parameters"
-        env = prepare_default(env)      
-    elif env['COMPILER'] == 'g++':
+        env = prepare_default(env)
+    elif env['COMPILER'] == 'gpp':
         env = prepare_gpp(env)
     elif env['COMPILER'] == 'gcc':
         env = prepare_gcc(env)
-    elif env['COMPILER'] == 'clang++':
-        env = prepare_clangpp(env)        
+    elif env['COMPILER'] == 'clangpp':
+        env = prepare_clangpp(env)
     elif env['COMPILER'] == 'mingw':
         env = prepare_mingw(env)
     elif env['COMPILER'].startswith('vc'):
@@ -87,7 +89,7 @@ def prepare_env(ARGUMENTS, ARGLIST):
         compiler = compiler.replace('exp','')
         env['MSVC_VERSION'] = compiler+'.0'+Exp
     else:
-        print "---Custom---"        
+        print "---Custom---"
         env['TOOLS'] = ['default']
         env['CC'] = env['COMPILER']
         env['LINK'] = env['LINKER']
@@ -97,6 +99,8 @@ def prepare_env(ARGUMENTS, ARGLIST):
     env['CPPPATH'].extend(findArgs(ARGLIST,'cpppath'))
     env['CPPDEFINES'].extend(findArgs(ARGLIST,'define'))
     env['CCFLAGS'].extend(findArgs(ARGLIST,'cflag'))
+    env['CXXFLAGS'].extend(findArgs(ARGLIST,'cxxflag'))
+    env['CPPFLAGS'].extend(findArgs(ARGLIST,'cppflag'))
     env['LINKFLAGS'].extend(findArgs(ARGLIST,'lflag'))
     env['LIBPATH'].extend(findArgs(ARGLIST,'libpath'))
     env['LIBS'].extend(findArgs(ARGLIST,'lib'))
@@ -152,7 +156,7 @@ def printHelp():
     print "  snocs example compiler=vc9 test"
     print "**********************"
     print "Available options:"
-    print "  compiler={gcc,g++,mingw,clang++,vc9,vc9exp,vc10,vc10exp,vc11,vc11exp}"
+    print "  compiler={gcc,gpp,mingw,clangpp,vc9,vc9exp,vc10,vc10exp,vc11,vc11exp}"
     print "  configuration={Debug,Release}"
     print "  platform={x86,Win32,x64} # Win32 is an alias to x86"
     print "  verbose=0|1|2 # enables scons debug output"
