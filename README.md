@@ -18,7 +18,7 @@ Installation
 
 Clone repo, add to the PATH
 
-Test that all is well:
+Check that all is well:
 
     snocs example compiler=gcc test
 
