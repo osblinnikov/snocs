@@ -55,8 +55,8 @@ Available SNocs options:
     define="DEFINITION1=100" define=DEFINE2
     libpath=PATH_TO_LIBRARIES
     lib=ADDITIONAL_LIBRARY_NAME
-    cflag=FLAG1 cflag=FLAG2 cflag=FLAG3 #Compile flags
-    lflag=FLAG1 lflag=FLAG2 lflag=FLAG3 #Link flags
+    cflag=FLAG1 cxxflag=FLAG2 cppflag=FLAG3 #Compile flags
+    lflag=FLAG1 lflag=FLAG2   lflag=FLAG3   #Link flags
 
 Available targets:
 
