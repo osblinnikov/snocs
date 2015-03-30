@@ -96,6 +96,13 @@ def prepare_env(ARGUMENTS, ARGLIST):
         print "compiler: "+env['CC']
         print "linker: "+env['LINK']
 
+    if env.has_key("COMPILER_PATH"):
+        print "Will use provided COMPILER_PATH="+env["COMPILER_PATH"]
+        env['CC'] = env["COMPILER_PATH"]
+    if env.has_key("LINKER_PATH"):
+        print "Will use provided LINKER_PATH="+env["LINKER_PATH"]
+        env['LINK'] = env["LINKER_PATH"]
+
     env['CPPPATH'].extend(findArgs(ARGLIST,'cpppath'))
     env['CPPDEFINES'].extend(findArgs(ARGLIST,'define'))
     env['CCFLAGS'].extend(findArgs(ARGLIST,'cflag'))
@@ -171,6 +178,8 @@ def printHelp():
     print "  --no-PROJECT1_PREFIX or without=PROJECT1_PREFIX without=PROJECT2_PREFIX # disable projects compilation"
     print "        PROJECT1_PREFIX must match to the begining of the project name."
     print "        PREFIX can start with *, it means that the name should contain this PREFIX"
+    print "  compiler_path=FULL_PATH_TO_THE_COMPILER"
+    print "  linker_path=FULL_PATH_TO_THE_LINKER"
     print "  cpppath=PATH_TO_INCLUDES1 cpppath=PATH_TO_INCLUDES2"
     print "  define=\"DEFINITION1=100\" define=DEFINE2"
     print "  libpath=PATH_TO_LIBRARIES"
