@@ -26,7 +26,7 @@ def prepare_clangpp(env):
         env['LIBPATH'].extend(['/usr/local/lib64'])
     else:
         print "Unknown platform: "+env['PLATFORM']
-        exit()
+        sys.exit()
     if env['CONFIGURATION'] == 'Debug':
         env['CPPFLAGS'].extend(['-g'])
     return env

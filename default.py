@@ -15,7 +15,7 @@ def prepare_default(env):
         env['LINKFLAGS'].extend([])
     else:
         print "Unknown platform: "+env['PLATFORM']
-        exit()
+        sys.exit()
     if env['configuration'] == 'Debug':
         env['CCFLAGS'].extend([])
     return env

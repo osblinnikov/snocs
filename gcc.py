@@ -18,7 +18,7 @@ def prepare_gcc(env):
         env['LIBPATH'].extend(['/usr/local/lib64'])
     else:
         print "Unknown platform: "+env['PLATFORM']
-        exit()
+        sys.exit()
     if env['CONFIGURATION'] == 'Debug':
         env['CCFLAGS'].extend(['-g'])
     return env

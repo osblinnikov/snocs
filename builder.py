@@ -13,6 +13,27 @@ from clangpp import *
 #PLEASE change it if you don't want the standard snocs location
 PROJECTS_SRC_PATH = os.getenv('SNOCS_PROJECTS_SRC_PATH', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
 
+def detectQtDir(platform,QTVER):
+  QTDIR = os.environ.get("QTDIR",'')
+  if len(QTDIR) == 0:
+    if sys.platform.startswith("linux"):
+      if platform == 'x86':
+        QTDIR = os.path.expanduser("~/Qt-x86/"+QTVER+"/gcc")
+      else:
+        QTDIR = os.path.expanduser("~/Qt/"+QTVER+"/gcc_64")
+    elif sys.platform.startswith("windows"):
+      QTDIR = "C:\\Qt\\"+QTVER+"\\mingw"
+    else:
+      print "builder.detectQtDir(): QTDIR env variable is not set and OS "+sys.platform+" is unknown"
+  if QTDIR.startswith("~"):
+    QTDIR = os.path.expanduser(QTDIR)
+  if not os.path.exists(QTDIR):
+    print 'builder.detectQtDir(): QTDIR='+QTDIR+" not exists"
+    sys.exit(1)
+  return QTDIR
+
+
+
 def prepare_env(ARGUMENTS, ARGLIST):
     #--------command line arguments------------
     env = {}
@@ -68,6 +89,22 @@ def prepare_env(ARGUMENTS, ARGLIST):
         env['PROJECTS_SRC_PATH']
     ]
     env['CPPDEFINES'] = []
+
+    env['QTVER'] = os.environ.get("QTVER", False)
+    if env['QTVER'] != False:
+        if env['QTVER'].startswith('5'):
+          env['QT_DIR_NAME'] = 'QT5DIR'
+          env['QT_TOOL'] = 'qt5'
+        elif env['QTVER'].startswith('4'):
+          env['QT_DIR_NAME'] = 'QT4DIR'
+          env['QT_TOOL'] = 'qt4'
+        else:
+          print 'Unknown QTVER '+env['QTVER']+" only started with 4 or 5 is allowed"
+          sys.exit(1)
+        env['QT_DIR'] = detectQtDir(env['PLATFORM'],env['QTVER'])
+        env['QT_PKG_CONFIG_PATH'] = os.path.join(env['QT_DIR'], 'lib/pkgconfig')
+
+
     #--------SWITCHING COMPILER------
     if env['COMPILER'] == 'default':
         print "WARNING: compiler was not specified, using default parameters"

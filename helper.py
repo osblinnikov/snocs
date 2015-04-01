@@ -345,14 +345,14 @@ def AddPthreads(env):
       CPPPATH = [os.path.join(PATH_TO_PTHREADS_WIN,'include')],
       LIBPATH = [os.path.join(PATH_TO_PTHREADS_WIN,'lib',env['PLATFORM'])]
     )
-    env.AppendENVPath('PATH', os.path.join(PATH_TO_PTHREADS_WIN,'dll',env['PLATFORM']))
+    env['prj_env'].AppendENVPath('PATH', os.path.join(PATH_TO_PTHREADS_WIN,'dll',env['PLATFORM']))
   elif env['COMPILER'] == 'mingw':
     env['prj_env'].Append(
       LIBS = ['pthreadGC2'],
       CPPPATH = [os.path.join(PATH_TO_PTHREADS_WIN,'include')],
       LIBPATH = [os.path.join(PATH_TO_PTHREADS_WIN,'lib',env['PLATFORM'])]
     )
-    env.AppendENVPath('PATH', os.path.join(PATH_TO_PTHREADS_WIN,'dll',env['PLATFORM']))
+    env['prj_env'].AppendENVPath('PATH', os.path.join(PATH_TO_PTHREADS_WIN,'dll',env['PLATFORM']))
   elif not env.has_key('LINK'):
     env['prj_env'].Append(
       # LIBS = ['pthread'],
