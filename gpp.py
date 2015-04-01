@@ -18,7 +18,7 @@ def prepare_gpp(env):
           env['QT_TOOL'] = 'qt4'
         else:
           print 'Unknown QTVER '+env['QTVER']+" only started with 4 or 5 is allowed"
-          Exit(1)
+          sys.exit(1)
         env['QT_DIR'] = detectLatestQtDir(env['PLATFORM'],env['QTVER'])
         env['QT_PKG_CONFIG_PATH'] = os.path.join(env['QT_DIR'], 'lib/pkgconfig')
 
