@@ -4,10 +4,10 @@ from helper import *
 Import( 'env' )
 
 def add_dependencies(env):
-    #airuTech = join(args['SNOCSCRIPT_PATH'],'..','..')
-    #projectsRoot = args['PROJECTS_ROOT_PATH']
-    # AddDependency(args,'CNetsTimeUtils',join(airuTech,'cnets','timeUtils'))
+    # AddDependency(env,'libcaf_core','github.com/actor-framework/libcaf_core')
     AddPthreads(env)
+    # AddNetwork(env)
+    # AddOpenGL(env)
 
 c = {}
 c['PROG_NAME'] = 'CNetsTimeUtils'
