@@ -3,15 +3,16 @@ SNocs
 
 0. a wrapper for SCons Software Construction tool (www.scons.org)
 1. is integrated into golang-like workspace structure (http://golang.org/doc/code.html), but can be easily configured
-2. able to build any project from your's workspace even you are not in project directory
-3. makes dependency management easy from SNocscript (see the example)
-4. allows you to choose compiler, platform and configuration from command line
-5. enables you to set up Unit tests for the project
+2. able to build any project from your workspace even if you are not in the project's directory
+3. makes dependency management easy from SNocscript using AddDependency function (see the example/SNocscript.py and/or helper.py)
+4. allows you to choose compiler, platform and configuration from the command line
+5. enables you to automatically set up and execute Unit tests for the project
 
-If you want to change default workspace directory just set SNOCS_PROJECTS_SRC_PATH environment variable. 
-If you want to change default installation paths then set SNOCS_INSTALL_LIB_PATH and SNOCS_INSTALL_BIN_PATH environment variables" 
-
-During test phase of building, SNocs extends it's LD_LIBRARY_PATH and PATH variables to allow searching for shared libraries
+    If you want to change default workspace directory just set SNOCS_PROJECTS_SRC_PATH environment variable. 
+    
+    If you want to change default installation paths then set SNOCS_INSTALL_LIB_PATH and SNOCS_INSTALL_BIN_PATH environment variables"
+    
+    During test phase of building, SNocs extends it's LD_LIBRARY_PATH and PATH variables to allow searching for shared libraries
 
 Installation
 ---
@@ -24,7 +25,16 @@ Check that all is well:
 
 Enjoy your crossplatform usage of SNocs!
 
-Usage
+SNocscript.py
+---
+
+This file is used for specification your build properties for every project in the workspace. During build SNocs scanning all the dependent projects using pathToProject specified in the `AddDependency(env, targetName, pathToProject)` function from `helper.py`. During this scans SNocs uses `SNocscript.py` files in the same way as SCons uses SConscript (see `SNocstruct`, search for `SConscript` function call). So what is SNocs, efficiently that is a fancy but very powerful wrapper for SCons. Developer is enabled to write high-level project description in SNocscript.py and SNocs will make the all magic for project dependency management, includes, libraries, static and shared libraries build, compilator choosing and more. At the same time developer is free to use low-level SCons API thus SNocs "batteries" are included but adjustable and/or removable. If you want to use SCons libraries search see the example [here](https://github.com/osblinnikov/caf-workspace/blob/master/actor-framework-snocs/libcaf_opencl_SNocscript.py), if you want to create multiple test target per project instead of a single one see [this example](https://github.com/osblinnikov/caf-workspace/blob/master/actor-framework-snocs/unit_testing_SNocscript.py) , if you wanna make multiple executable targets in per project, such as examples of your project usage see [this SNocscript.py](https://github.com/osblinnikov/caf-workspace/blob/master/actor-framework-snocs/examples_SNocscript.py).
+
+To get started writing your new project or adapt existing project to SNocs see the [example directory](https://github.com/osblinnikov/snocs/blob/master/example/). In case you need more flexibility check the source code of [helper functions](https://github.com/osblinnikov/snocs/blob/master/helper.py). Or these [SNocscripts for CAF build](https://github.com/osblinnikov/caf-workspace/tree/master/actor-framework-snocs)
+
+Feel free to ask for help in the issue tracker.
+
+Usage from command line
 ---
 
 snocs [SNocscriptFilePath] [options] [target]
