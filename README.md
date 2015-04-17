@@ -13,7 +13,8 @@ SNocs
     If you want to change default installation paths then set SNOCS_INSTALL_LIB_PATH and SNOCS_INSTALL_BIN_PATH environment variables"
     
     During test phase of building, SNocs extends it's LD_LIBRARY_PATH and PATH variables to allow searching for shared libraries
-sea
+
+
 Installation
 ---
 
