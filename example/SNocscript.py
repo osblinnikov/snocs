@@ -11,7 +11,7 @@ def add_dependencies(env):
 
 c = {}
 c['PROG_NAME'] = 'CNetsTimeUtils'
-c['sourceFiles'] = ['timeUtils.c']
+c['sourceFiles'] = ['timeUtils.c'] #if not set - snocs will scan src folder for c/cpp files
 c['testFiles'] = ['timeUtilsTests.c']
 c['runFiles'] = ['main.c']
 c['defines'] = []
