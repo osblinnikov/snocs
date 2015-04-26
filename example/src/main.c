@@ -1,4 +1,4 @@
-#include "../include/timeUtils.h"
+#include "../timeUtils.h"
 #include <stdio.h>
 
 int main(){
