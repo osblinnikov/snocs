@@ -69,6 +69,7 @@ def prepare_env(ARGUMENTS, ARGLIST):
     #--------deploy parameters--------
     env['INSTALL_BIN_PATH'] = os.getenv('SNOCS_INSTALL_BIN_PATH', os.path.abspath(os.path.join(PROJECTS_SRC_PATH,'build','bin')))
     env['INSTALL_LIB_PATH'] = os.getenv('SNOCS_INSTALL_LIB_PATH', os.path.abspath(os.path.join(PROJECTS_SRC_PATH,'build','lib')))
+    env['INSTALL_INC_PATH'] = os.getenv('SNOCS_INSTALL_INC_PATH', os.path.abspath(os.path.join(PROJECTS_SRC_PATH,'build','include')))
     env['PROJECTS_SRC_PATH'] = PROJECTS_SRC_PATH
     env['INSTALL_ALIASES'] = [] #here will be the targets for install alias
     env['TEST_ALIASES'] = [] #here will be the targets for test alias
@@ -84,9 +85,12 @@ def prepare_env(ARGUMENTS, ARGLIST):
     env['CPPFLAGS'] = []
     env['CXXFLAGS'] = []
     env['LIBS'] = []
-    env['LIBPATH']=[]
+    env['LIBPATH']=[
+        env['INSTALL_LIB_PATH']
+    ]
     env['CPPPATH'] = [
-        env['PROJECTS_SRC_PATH']
+        env['PROJECTS_SRC_PATH'],
+        env['INSTALL_INC_PATH']
     ]
     env['CPPDEFINES'] = []
 
