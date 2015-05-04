@@ -93,6 +93,10 @@ def prepare_env(ARGUMENTS, ARGLIST):
         env['INSTALL_INC_PATH']
     ]
     env['CPPDEFINES'] = []
+    if env['CONFIGURATION'] == 'Debug':
+        env['CPPDEFINES'].extend(['_DEBUG'])
+    else:
+        env['CPPDEFINES'].extend(['NDEBUG'])
 
     env['QTVER'] = os.environ.get("QTVER", False)
     if env['QTVER'] != False:

@@ -29,7 +29,6 @@ def prepare_vc9(env):
         env['LINKFLAGS'].extend(['/NOLOGO','/SUBSYSTEM:CONSOLE','/DEBUG','/MACHINE:'+env['TARGET_ARCH'].upper()])
         env['CPPDEFINES'].extend([ 
             'WIN32',
-            '_DEBUG',
             '_CONSOLE'
         ])
         env['CPPFLAGS'].extend(['/W4','/EHsc','/RTC1','/MDd','/nologo','/Z7','/TP','/errorReport:prompt'])
@@ -38,7 +37,6 @@ def prepare_vc9(env):
         env['LINKFLAGS'].extend(['/NOLOGO','/SUBSYSTEM:CONSOLE','/MACHINE:'+env['TARGET_ARCH'].upper()])
         env['CPPDEFINES'].extend([ 
             'WIN32',
-            'NDEBUG',
             '_CONSOLE'
         ])
         env['CPPFLAGS'].extend(['/W4','/EHsc','/RTC1','/MD','/nologo','/Z7','/TP','/errorReport:prompt'])
