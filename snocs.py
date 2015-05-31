@@ -6,6 +6,8 @@ import imp
 from builder import PROJECTS_SRC_PATH
 from builder import printHelp
 
+SCONS_BIN_DIR = os.getenv('SCONS_BIN_DIR', '')
+#SCONS_LIB_DIR = "SCONS_LIB_DIR=/opt/poky-edison/1.6.1/sysroots/core2-32-poky-linux/usr/lib/python2.7/site-packages "
 def main(argv):
     SNocscript = None
     firstRealArgI = 1
@@ -76,7 +78,7 @@ def main(argv):
                 CLEANING_STAGE = 1
             if ' ' in argv[i] and '=' in argv[i]:
                 s = argv[i].split('=')
-                argv[i] = s[0]+"=\""+s[1]+"\""
+                argv[i] = s[0]+"=\""+('='.join(s[1:]))+"\""
             OTHER_ARGUMENTS+=" "+argv[i]
         #end for arguments
         
@@ -91,7 +93,8 @@ def main(argv):
     for name in SKIP_PROJECT_NAMES:
         OTHER_ARGUMENTS +=" without="+name
         # OTHER_ARGUMENTS +=" without="+(':'.join(SKIP_PROJECT_NAMES)) 
-    snocsStr = "scons -f "+os.path.abspath(os.path.dirname(__file__))+"/SNocstruct snocscript="+SNocscript+OTHER_ARGUMENTS
+
+    snocsStr = SCONS_BIN_DIR+"scons -f "+os.path.abspath(os.path.dirname(__file__))+"/SNocstruct snocscript="+SNocscript+OTHER_ARGUMENTS
     print snocsStr
     os.system(snocsStr)
 

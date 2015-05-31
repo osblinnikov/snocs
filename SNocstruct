@@ -20,17 +20,21 @@ env['scons'] = Environment(
 
 verbosity =  int(env['VERBOSE'])
 if verbosity == 0:
-    env['scons']['CCCOMSTR'] = "Compiling $SOURCES"
-    env['scons']['CXXCOMSTR'] = "Compiling $SOURCES"
-    env['scons']['LINKCOMSTR'] = "Linking $TARGET"
-    env['scons']['ARCOMSTR'] = "Archieving $TARGET"
+    env['scons']['CCCOMSTR'] = GREEN+"Compiling $SOURCES"+NOCOLOR
+    env['scons']['CXXCOMSTR'] = GREEN+"Compiling $SOURCES"+NOCOLOR
+    env['scons']['LINKCOMSTR'] = GREEN+"Linking $TARGET"+NOCOLOR
+    env['scons']['ARCOMSTR'] = GREEN+"Archieving $TARGET"+NOCOLOR
+    env['scons']['RANLIBCOMSTR'] = GREEN+"Indexing $TARGET"+NOCOLOR
+    env['scons']['SHCCCOMSTR'] = GREEN+"Compiling shared object $TARGET"+NOCOLOR
 elif verbosity == 1:
-    env['scons']['CCCOMSTR'] = "Compiling $TARGET $SOURCES"
-    env['scons']['CXXCOMSTR'] = "Compiling $TARGET $SOURCES"
-    env['scons']['LINKCOMSTR'] = "Linking $TARGET $LINKFLAGS"
-    env['scons']['ARCOMSTR'] = "Archieving $TARGET $LINKFLAGS"
+    env['scons']['CCCOMSTR'] = GREEN+"Compiling $TARGET $SOURCES"+NOCOLOR
+    env['scons']['CXXCOMSTR'] = GREEN+"Compiling $TARGET $SOURCES"+NOCOLOR
+    env['scons']['LINKCOMSTR'] = GREEN+"Linking $TARGET $LINKFLAGS"+NOCOLOR
+    env['scons']['ARCOMSTR'] = GREEN+"Archieving $TARGET $LINKFLAGS"+NOCOLOR
+    env['scons']['RANLIBCOMSTR'] = GREEN+"Indexing $TARGET $LINKFLAGS"+NOCOLOR
+    env['scons']['SHCCCOMSTR'] = GREEN+"Compiling shared object $TARGET $LINKFLAGS"+NOCOLOR
 else:
-    Progress('Evaluating $TARGET\n')
+    Progress(GREEN+'Evaluating $TARGET\n'+NOCOLOR)
 
         
 if env.has_key('CCFLAGS') and env['CCFLAGS'] != None:
@@ -45,6 +49,11 @@ if env.has_key('CPPFLAGS') and env['CPPFLAGS'] != None:
     env['scons'].Replace(CPPFLAGS=env['CPPFLAGS'])    
 if env.has_key('LINK') and env['LINK'] != None:
     env['scons'].Replace(LINK=env['LINK'])
+if env.has_key('AR') and env['AR'] != None:
+    env['scons'].Replace(AR=env['AR'])
+if env.has_key('RANLIB') and env['RANLIB'] != None:
+    env['scons'].Replace(RANLIB=env['RANLIB'])
+
 
 env['scons'].AppendENVPath('LD_LIBRARY_PATH', env['INSTALL_LIB_PATH'])
 env['scons'].AppendENVPath('PATH', env['INSTALL_LIB_PATH'])

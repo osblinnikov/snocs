@@ -16,6 +16,6 @@ def prepare_default(env):
     else:
         print "Unknown platform: "+env['PLATFORM']
         sys.exit()
-    if env['configuration'] == 'Debug':
+    if env['CONFIGURATION'] == 'Debug':
         env['CCFLAGS'].extend([])
     return env

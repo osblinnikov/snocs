@@ -10,9 +10,18 @@ from default import *
 from vc9 import *
 from clangpp import *
 
+import platform
+
 #PLEASE change it if you don't want the standard snocs location
 PROJECTS_SRC_PATH = os.getenv('SNOCS_PROJECTS_SRC_PATH', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
 
+if platform.system() == 'Linux':
+    RED='\033[0;31m'
+    GREEN='\033[1;32m'
+    DGREEN='\033[0;32m'
+    NOCOLOR='\033[0m'
+else:
+    DGREEN=NOCOLOR=GREEN=RED=''
 def detectQtDir(platform,QTVER):
   QTDIR = os.environ.get("QTDIR",'')
   if len(QTDIR) == 0:
@@ -24,11 +33,11 @@ def detectQtDir(platform,QTVER):
     elif sys.platform.startswith("windows"):
       QTDIR = "C:\\Qt\\"+QTVER+"\\mingw"
     else:
-      print "builder.detectQtDir(): QTDIR env variable is not set and OS "+sys.platform+" is unknown"
+      print RED+"builder.detectQtDir(): QTDIR env variable is not set and OS "+sys.platform+" is unknown"+NOCOLOR
   if QTDIR.startswith("~"):
     QTDIR = os.path.expanduser(QTDIR)
   if not os.path.exists(QTDIR):
-    print 'builder.detectQtDir(): QTDIR='+QTDIR+" not exists"
+    print RED+'builder.detectQtDir(): QTDIR='+QTDIR+" not exists"+NOCOLOR
     sys.exit(1)
   return QTDIR
 
@@ -54,7 +63,7 @@ def prepare_env(ARGUMENTS, ARGLIST):
     env['WITHOUT'] = findArgs(ARGLIST,'without')
 
     if env['SNOCSCRIPT'] == None or env['SNOCSCRIPT']=="":
-        print "SNocscript is not specified!"
+        print RED+"SNocscript is not specified!"+NOCOLOR
         exit()
     
     if env['CONFIGURATION'].lower() == 'debug'.lower():
@@ -107,7 +116,7 @@ def prepare_env(ARGUMENTS, ARGLIST):
           env['QT_DIR_NAME'] = 'QT4DIR'
           env['QT_TOOL'] = 'qt4'
         else:
-          print 'Unknown QTVER '+env['QTVER']+" only started with 4 or 5 is allowed"
+          print RED+'Unknown QTVER '+env['QTVER']+" only started with 4 or 5 is allowed"+NOCOLOR
           sys.exit(1)
         env['QT_DIR'] = detectQtDir(env['PLATFORM'],env['QTVER'])
         env['QT_PKG_CONFIG_PATH'] = os.path.join(env['QT_DIR'], 'lib/pkgconfig')
@@ -135,20 +144,25 @@ def prepare_env(ARGUMENTS, ARGLIST):
         compiler = compiler.replace('exp','')
         env['MSVC_VERSION'] = compiler+'.0'+Exp
     else:
-        print "---Custom---"
+        print DGREEN+"---Custom---"+NOCOLOR
         env['TOOLS'] = ['default']
         env['CC'] = env['COMPILER']
         env['LINK'] = env['LINKER']
-        print "compiler: "+env['CC']
-        print "linker: "+env['LINK']
+        print DGREEN+"compiler: "+env['CC']+NOCOLOR
+        print DGREEN+"linker: "+env['LINK']+NOCOLOR
 
     if env.has_key("COMPILER_PATH"):
-        print "Will use provided COMPILER_PATH="+env["COMPILER_PATH"]
+        print DGREEN+"Will use provided COMPILER_PATH="+env["COMPILER_PATH"]+NOCOLOR
         env['CC'] = env["COMPILER_PATH"]
     if env.has_key("LINKER_PATH"):
-        print "Will use provided LINKER_PATH="+env["LINKER_PATH"]
+        print DGREEN+"Will use provided LINKER_PATH="+env["LINKER_PATH"]+NOCOLOR
         env['LINK'] = env["LINKER_PATH"]
-
+    if env.has_key("ARCHIEVER_PATH"):
+        print DGREEN+"Will use provided ARCHIEVER_PATH="+env["ARCHIEVER_PATH"]+NOCOLOR
+        env['AR'] = env["ARCHIEVER_PATH"]
+    if env.has_key("RANLIB_PATH"):
+        print DGREEN+"Will use provided RUNLIB_PATH="+env["RANLIB_PATH"]+NOCOLOR
+        env['RANLIB'] = env["RANLIB_PATH"]        
     env['CPPPATH'].extend(findArgs(ARGLIST,'cpppath'))
     env['CPPDEFINES'].extend(findArgs(ARGLIST,'define'))
     env['CCFLAGS'].extend(findArgs(ARGLIST,'cflag'))
