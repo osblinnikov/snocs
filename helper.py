@@ -104,6 +104,9 @@ def DefaultLibraryConfig(env, c):
   if not c.has_key("CPPDEFINES"):
     c['CPPDEFINES'] = []
 
+  if c.has_key("defines"):
+    c['CPPDEFINES'] += c["defines"]
+
   testInclDeps(c)
 
   if not c.has_key("sourceFiles") or len(c['sourceFiles'])==0:
