@@ -107,11 +107,19 @@ def DefaultLibraryConfig(env, c):
   if c.has_key("defines"):
     c['CPPDEFINES'] += c["defines"]
 
+  if not c.has_key("SRCPATH"):
+    c["SRCPATH"] = "src"
+  c["SRCPATH"] = os.path.join(*c["SRCPATH"].split("/"))
+
+  if not c.has_key("TESTPATH"):
+    c["TESTPATH"] = "tests"
+  c["TESTPATH"] = os.path.join(*c["TESTPATH"].split("/"))
+
   testInclDeps(c)
 
   if not c.has_key("sourceFiles") or len(c['sourceFiles'])==0:
       c['sourceFiles'] = []
-      srcFolder = os.path.join(env['SNOCSCRIPT_PATH'],'src')
+      srcFolder = os.path.join(env['SNOCSCRIPT_PATH'],c["SRCPATH"])
       for root, dirs, files in os.walk(srcFolder):
         if root.endswith('.tmp'):
           continue
@@ -133,7 +141,7 @@ def DefaultLibraryConfig(env, c):
   )
   c['inclDeps'+DepsFunc](env)
   
-  env['scons'].Default(PrefixLibrary(env, 'src', c['sourceFiles']))
+  env['scons'].Default(PrefixLibrary(env, c["SRCPATH"], c['sourceFiles']))
 
   if c.has_key('testFiles'):
     #       STATIC TESTS
@@ -148,7 +156,7 @@ def DefaultLibraryConfig(env, c):
     c['inclDeps'+DepsFunc+'_tests'](env)
     c['inclDeps'+DepsFunc](env)
     
-    env['scons'].Default(PrefixTest(env, 'tests', c['testFiles']))
+    env['scons'].Default(PrefixTest(env, c["TESTPATH"], c['testFiles']))
 
   if c.has_key('runFiles'):
     #       SHARED RUN
@@ -165,7 +173,7 @@ def DefaultLibraryConfig(env, c):
     c['inclDeps'+DepsFunc+'_run'](env)
     c['inclDeps'+DepsFunc](env)
     
-    env['scons'].Default(PrefixProgram(env, 'src', c['runFiles']))
+    env['scons'].Default(PrefixProgram(env, c["SRCPATH"], c['runFiles']))
 
   env['SHARED'] = SHARED_VAR_BCP
 
