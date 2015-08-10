@@ -211,7 +211,7 @@ def preparePaths(env):
 
 def printHelp():
     print "**********************"
-    print "Snocs is a little wrapper on SCons Software Construction tool (http://www.scons.org/)."
+    print "Snocs is a build tool based on SCons Software Construction tool (http://www.scons.org/)."
     print "Usage: snocs [SNocscriptFilePath] [options]"
     print "Examples:"
     print "  snocs .. compiler=vc9 platform=x86 configuration=Debug" 

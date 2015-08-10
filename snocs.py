@@ -8,7 +8,7 @@ from builder import printHelp
 
 SCONS_BIN_DIR = os.getenv('SCONS_BIN_DIR', '')
 #SCONS_LIB_DIR = "SCONS_LIB_DIR=/opt/poky-edison/1.6.1/sysroots/core2-32-poky-linux/usr/lib/python2.7/site-packages "
-def main(argv):
+def Snocs(argv):
     SNocscript = None
     firstRealArgI = 1
     #in case we don't have any arguments
@@ -100,4 +100,4 @@ def main(argv):
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    Snocs(sys.argv)
