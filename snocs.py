@@ -2,7 +2,7 @@
 import os.path
 import sys
 import os
-import imp
+import importlib
 from builder import PROJECTS_SRC_PATH
 from builder import printHelp
 
@@ -18,7 +18,7 @@ def Snocs(argv):
             firstRealArgI = firstRealArgI - 1
             SNocscript = os.path.join(os.getcwd(),"SNocscript.py")
         else:
-            print "No SNocscript files found"
+            print("No SNocscript files found")
             printHelp()
             exit()
     else:
@@ -36,11 +36,11 @@ def Snocs(argv):
             firstRealArgI = firstRealArgI - 1
             SNocscript = os.path.join(os.getcwd(),"SNocscript.py")
         else:
-            print "No "+os.path.join(os.getcwd(),"SNocscript.py")
-            print "No "+os.path.join(argv[firstRealArgI],"SNocscript.py")
-            print "No "+os.path.join(os.getcwd(),argv[firstRealArgI],"SNocscript.py")
-            print "No "+os.path.join(PROJECTS_SRC_PATH,argv[firstRealArgI],"SNocscript.py")
-            print "NO SNocscript files found"
+            print("No "+os.path.join(os.getcwd(),"SNocscript.py"))
+            print("No "+os.path.join(argv[firstRealArgI],"SNocscript.py"))
+            print("No "+os.path.join(os.getcwd(),argv[firstRealArgI],"SNocscript.py"))
+            print("No "+os.path.join(PROJECTS_SRC_PATH,argv[firstRealArgI],"SNocscript.py"))
+            print("NO SNocscript files found")
             printHelp()
             exit()
         
@@ -60,7 +60,7 @@ def Snocs(argv):
                 #imp.load_source('SNocscript',os.path.dirname(SNocscript))
                 exit()
             elif argv[i] == '-all':
-                print "* Will make the dependencies"
+                print("* Will make the dependencies")
                 ALL_PROJECTS = 1
                 continue
             elif argv[i] == '--more-warnings':
@@ -95,7 +95,7 @@ def Snocs(argv):
         # OTHER_ARGUMENTS +=" without="+(':'.join(SKIP_PROJECT_NAMES)) 
 
     snocsStr = SCONS_BIN_DIR+"scons -f "+os.path.abspath(os.path.dirname(__file__))+"/SNocstruct snocscript="+SNocscript+OTHER_ARGUMENTS
-    print snocsStr
+    print(snocsStr)
     os.system(snocsStr)
 
 

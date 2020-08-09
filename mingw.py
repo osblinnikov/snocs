@@ -6,10 +6,10 @@ def prepare_mingw(env):
     env['TOOLS'] = ['mingw']
 
     additionalCPPFLAGS = []
-    if env.has_key('more-warnings') and env['more-warnings'] == '1':
+    if env.__contains__('more-warnings') and env['more-warnings'] == '1':
         additionalCPPFLAGS += warnFlags
 
-    if env.has_key('warnings-as-errors') and env['warnings-as-errors'] == '1':
+    if env.__contains__('warnings-as-errors') and env['warnings-as-errors'] == '1':
         additionalCPPFLAGS += '-Werror'
 
     env['CPPPATH'].extend([])
@@ -22,7 +22,7 @@ def prepare_mingw(env):
         env['CPPFLAGS'].extend(['-m64','-std=gnu++11']+additionalCPPFLAGS)
         env['LINKFLAGS'].extend(['-m64'])
     else:
-        print "Unknown platform: "+env['PLATFORM']
+        print("Unknown platform: "+env['PLATFORM'])
         sys.exit()
     if env['CONFIGURATION'] == 'Debug':
         env['CPPFLAGS'].extend(['-g'])

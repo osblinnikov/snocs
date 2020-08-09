@@ -18,6 +18,10 @@ env['scons'] = Environment(
     ENV = os.environ
 )
 
+for path in env['LD_LIBRARY_PATH']:
+    env['scons'].AppendENVPath('LD_LIBRARY_PATH', path)
+    env['scons'].AppendENVPath('PATH', path)
+
 verbosity =  int(env['VERBOSE'])
 if verbosity == 0:
     env['scons']['CCCOMSTR'] = GREEN+"Compiling $SOURCES"+NOCOLOR
@@ -37,21 +41,21 @@ else:
     Progress(GREEN+'Evaluating $TARGET\n'+NOCOLOR)
 
         
-if env.has_key('CCFLAGS') and env['CCFLAGS'] != None:
+if env.__contains__('CCFLAGS') and env['CCFLAGS'] != None:
     env['scons'].Replace(CCFLAGS=env['CCFLAGS'])
-if env.has_key('CC') and env['CC'] != None:
+if env.__contains__('CC') and env['CC'] != None:
     env['scons'].Replace(CC=env['CC'])
-if env.has_key('CXX') and env['CXX'] != None:
+if env.__contains__('CXX') and env['CXX'] != None:
     env['scons'].Replace(CXX=env['CXX'])
-if env.has_key('CXXFLAGS') and env['CXXFLAGS'] != None:
+if env.__contains__('CXXFLAGS') and env['CXXFLAGS'] != None:
     env['scons'].Replace(CXXFLAGS=env['CXXFLAGS'])
-if env.has_key('CPPFLAGS') and env['CPPFLAGS'] != None:
+if env.__contains__('CPPFLAGS') and env['CPPFLAGS'] != None:
     env['scons'].Replace(CPPFLAGS=env['CPPFLAGS'])    
-if env.has_key('LINK') and env['LINK'] != None:
+if env.__contains__('LINK') and env['LINK'] != None:
     env['scons'].Replace(LINK=env['LINK'])
-if env.has_key('AR') and env['AR'] != None:
+if env.__contains__('AR') and env['AR'] != None:
     env['scons'].Replace(AR=env['AR'])
-if env.has_key('RANLIB') and env['RANLIB'] != None:
+if env.__contains__('RANLIB') and env['RANLIB'] != None:
     env['scons'].Replace(RANLIB=env['RANLIB'])
 
 
@@ -69,7 +73,7 @@ preparePaths(env)
 
 #start main build
 if verbosity > 1:
-    print env['SNOCSCRIPT_PATH']
+    print(env['SNOCSCRIPT_PATH'])
 # Export this environment for use by the SNocscript files
 Export( 'env' )
 SConscript( env['SNOCSCRIPT'] )
@@ -90,7 +94,7 @@ if env.get('CROSSPROJECT_DEPENDENCIES')!=None:
                 
                 if env['BUILD_ALL'] == '1':
                     if verbosity > 1:
-                        print env['SNOCSCRIPT_PATH']
+                        print(env['SNOCSCRIPT_PATH'])
                     SConscript(env['SNOCSCRIPT'])
                 dictLaunchedDependencies[depFullPath] = 1
                 break
@@ -102,7 +106,7 @@ if env['BUILD_ALL'] == '1':
     for prog in env['APP_DEPENDENCIES']:
         for dep in env['APP_DEPENDENCIES'][prog]:
             # print prog+" depending on "+dep
-            if env['APP_BUILD'].has_key(prog) and env['APP_BUILD'].has_key(dep):
+            if env['APP_BUILD'].__contains__(prog) and env['APP_BUILD'].__contains__(dep):
                 Requires(env['APP_BUILD'][prog], env['APP_BUILD'][dep])
 
 env['INSTALL_ALIASES'].append( env['TEST_ALIASES'] )

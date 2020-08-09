@@ -9,10 +9,10 @@ def prepare_clangpp(env):
     env['CPPPATH'].extend([])
     env['CPPDEFINES'].extend([])
     additionalCPPFLAGS = []
-    if env.has_key('more-warnings') and env['more-warnings'] == '1':
+    if env.__contains__('more-warnings') and env['more-warnings'] == '1':
         additionalCPPFLAGS += warnFlags
 
-    if env.has_key('warnings-as-errors') and env['warnings-as-errors'] == '1':
+    if env.__contains__('warnings-as-errors') and env['warnings-as-errors'] == '1':
         additionalCPPFLAGS += '-Werror'
 
     if env['PLATFORM'] == 'x86':
@@ -25,7 +25,7 @@ def prepare_clangpp(env):
         env['LINKFLAGS'].extend(['-m64','-stdlib=libc++'])
         env['LIBPATH'].extend(['/usr/local/lib64'])
     else:
-        print "Unknown platform: "+env['PLATFORM']
+        print("Unknown platform: "+env['PLATFORM'])
         sys.exit()
     if env['CONFIGURATION'] == 'Debug':
         env['CPPFLAGS'].extend(['-g'])

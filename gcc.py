@@ -17,7 +17,7 @@ def prepare_gcc(env):
         env['LINKFLAGS'].extend(['-m64'])
         env['LIBPATH'].extend(['/usr/local/lib64'])
     else:
-        print "Unknown platform: "+env['PLATFORM']
+        print("Unknown platform: "+env['PLATFORM'])
         sys.exit()
     if env['CONFIGURATION'] == 'Debug':
         env['CCFLAGS'].extend(['-g'])

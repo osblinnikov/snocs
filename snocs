@@ -2,4 +2,4 @@
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-$DIR/snocs.py "$@"
+python3 $DIR/snocs.py "$@"

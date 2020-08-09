@@ -3,6 +3,7 @@ import os
 import sys
 import copy
 
+from ipp import *
 from gpp import *
 from gcc import *
 from mingw import *
@@ -33,11 +34,11 @@ def detectQtDir(platform,QTVER):
     elif sys.platform.startswith("windows"):
       QTDIR = "C:\\Qt\\"+QTVER+"\\mingw"
     else:
-      print RED+"builder.detectQtDir(): QTDIR env variable is not set and OS "+sys.platform+" is unknown"+NOCOLOR
+      print(RED+"builder.detectQtDir(): QTDIR env variable is not set and OS "+sys.platform+" is unknown"+NOCOLOR)
   if QTDIR.startswith("~"):
     QTDIR = os.path.expanduser(QTDIR)
   if not os.path.exists(QTDIR):
-    print RED+'builder.detectQtDir(): QTDIR='+QTDIR+" not exists"+NOCOLOR
+    print(RED+'builder.detectQtDir(): QTDIR='+QTDIR+" not exists"+NOCOLOR)
     sys.exit(1)
   return QTDIR
 
@@ -46,7 +47,7 @@ def detectQtDir(platform,QTVER):
 def prepare_env(ARGUMENTS, ARGLIST):
     #--------command line arguments------------
     env = {}
-    for k,v in ARGUMENTS.iteritems():
+    for k,v in ARGUMENTS.items():
         env[k.upper()] = v
 
     #init defaults
@@ -63,7 +64,7 @@ def prepare_env(ARGUMENTS, ARGLIST):
     env['WITHOUT'] = findArgs(ARGLIST,'without')
 
     if env['SNOCSCRIPT'] == None or env['SNOCSCRIPT']=="":
-        print RED+"SNocscript is not specified!"+NOCOLOR
+        print(RED+"SNocscript is not specified!"+NOCOLOR)
         exit()
     
     if env['CONFIGURATION'].lower() == 'debug'.lower():
@@ -97,6 +98,7 @@ def prepare_env(ARGUMENTS, ARGLIST):
     env['LIBPATH']=[
         env['INSTALL_LIB_PATH']
     ]
+    env['LD_LIBRARY_PATH'] = []
     env['CPPPATH'] = [
         env['PROJECTS_SRC_PATH'],
         env['INSTALL_INC_PATH']
@@ -116,7 +118,7 @@ def prepare_env(ARGUMENTS, ARGLIST):
           env['QT_DIR_NAME'] = 'QT4DIR'
           env['QT_TOOL'] = 'qt4'
         else:
-          print RED+'Unknown QTVER '+env['QTVER']+" only started with 4 or 5 is allowed"+NOCOLOR
+          print(RED+'Unknown QTVER '+env['QTVER']+" only started with 4 or 5 is allowed"+NOCOLOR)
           sys.exit(1)
         env['QT_DIR'] = detectQtDir(env['PLATFORM'],env['QTVER'])
         env['QT_PKG_CONFIG_PATH'] = os.path.join(env['QT_DIR'], 'lib/pkgconfig')
@@ -124,8 +126,10 @@ def prepare_env(ARGUMENTS, ARGLIST):
 
     #--------SWITCHING COMPILER------
     if env['COMPILER'] == 'default':
-        print "WARNING: compiler was not specified, using default parameters"
+        print("WARNING: compiler was not specified, using default parameters")
         env = prepare_default(env)
+    elif env['COMPILER'] == 'ipp':
+        env = prepare_ipp(env)
     elif env['COMPILER'] == 'gpp':
         env = prepare_gpp(env)
     elif env['COMPILER'] == 'gcc':
@@ -136,7 +140,7 @@ def prepare_env(ARGUMENTS, ARGLIST):
         env = prepare_mingw(env)
     elif env['COMPILER'].startswith('vc'):
         env = prepare_vc9(env)
-        compiler = env['COMPILER'][2:]
+        compiler = env['COMPILER'][2:].lower() # skip vc
         if compiler.endswith('exp'):
             Exp = 'Exp'
         else:
@@ -144,24 +148,24 @@ def prepare_env(ARGUMENTS, ARGLIST):
         compiler = compiler.replace('exp','')
         env['MSVC_VERSION'] = compiler+'.0'+Exp
     else:
-        print DGREEN+"---Custom---"+NOCOLOR
+        print(DGREEN+"---Custom---"+NOCOLOR)
         env['TOOLS'] = ['default']
         env['CC'] = env['COMPILER']
         env['LINK'] = env['LINKER']
-        print DGREEN+"compiler: "+env['CC']+NOCOLOR
-        print DGREEN+"linker: "+env['LINK']+NOCOLOR
+        print(DGREEN+"compiler: "+env['CC']+NOCOLOR)
+        print(DGREEN+"linker: "+env['LINK']+NOCOLOR)
 
-    if env.has_key("COMPILER_PATH"):
-        print DGREEN+"Will use provided COMPILER_PATH="+env["COMPILER_PATH"]+NOCOLOR
+    if env.__contains__("COMPILER_PATH"):
+        print(DGREEN+"Will use provided COMPILER_PATH="+env["COMPILER_PATH"]+NOCOLOR)
         env['CC'] = env["COMPILER_PATH"]
-    if env.has_key("LINKER_PATH"):
-        print DGREEN+"Will use provided LINKER_PATH="+env["LINKER_PATH"]+NOCOLOR
+    if env.__contains__("LINKER_PATH"):
+        print(DGREEN+"Will use provided LINKER_PATH="+env["LINKER_PATH"]+NOCOLOR)
         env['LINK'] = env["LINKER_PATH"]
-    if env.has_key("ARCHIEVER_PATH"):
-        print DGREEN+"Will use provided ARCHIEVER_PATH="+env["ARCHIEVER_PATH"]+NOCOLOR
+    if env.__contains__("ARCHIEVER_PATH"):
+        print(DGREEN+"Will use provided ARCHIEVER_PATH="+env["ARCHIEVER_PATH"]+NOCOLOR)
         env['AR'] = env["ARCHIEVER_PATH"]
-    if env.has_key("RANLIB_PATH"):
-        print DGREEN+"Will use provided RUNLIB_PATH="+env["RANLIB_PATH"]+NOCOLOR
+    if env.__contains__("RANLIB_PATH"):
+        print(DGREEN+"Will use provided RUNLIB_PATH="+env["RANLIB_PATH"]+NOCOLOR)
         env['RANLIB'] = env["RANLIB_PATH"]        
     env['CPPPATH'].extend(findArgs(ARGLIST,'cpppath'))
     env['CPPDEFINES'].extend(findArgs(ARGLIST,'define'))
@@ -171,6 +175,7 @@ def prepare_env(ARGUMENTS, ARGLIST):
     env['LINKFLAGS'].extend(findArgs(ARGLIST,'lflag'))
     env['LIBPATH'].extend(findArgs(ARGLIST,'libpath'))
     env['LIBS'].extend(findArgs(ARGLIST,'lib'))
+    env['LD_LIBRARY_PATH'].extend(findArgs(ARGLIST,'ld_library_path'))
     env['bcp'] = copy.deepcopy(env)
 
     return env
@@ -181,8 +186,8 @@ def findArgs(ARGLIST, argName):
         if key.lower() == argName.lower():
             l.append(value)
     if len(l) > 0:
-        print argName+"s:"
-        print l
+        print(argName+"s:")
+        print(l)
     return l
 
 def builder_unit_test(target, source, env):
@@ -210,49 +215,50 @@ def preparePaths(env):
     env['scons'].AppendENVPath('PATH', env['LIB_DIR'])
 
 def printHelp():
-    print "**********************"
-    print "Snocs is a build tool based on SCons Software Construction tool (http://www.scons.org/)."
-    print "Usage: snocs [SNocscriptFilePath] [options]"
-    print "Examples:"
-    print "  snocs .. compiler=vc9 platform=x86 configuration=Debug" 
-    print "  snocs test -Q           #build and run tests with reduced log" 
-    print "  snocs install -c        #clean installation"
-    print "  snocs icanchangethisdomain/SomeProjectName -r  #run Python script"
-    print "SNocscriptFilePath can be absolute, relative to current path, or "
-    print "relative to projects root path e.g.:"
-    print "  snocs example compiler=vc9 test"
-    print "**********************"
-    print "Available options:"
-    print "  compiler={gcc,gpp,mingw,clangpp,vc9,vc9exp,vc10,vc10exp,vc11,vc11exp}"
-    print "  configuration={Debug,Release}"
-    print "  platform={x86,Win32,x64} # Win32 is an alias to x86"
-    print "  verbose=0|1|2 # enables scons debug output"
-    print "  shared=1|0 #enables building shared libraries for all projects of default config"
-    print "  testnorun=0|1 #disables tests run in case of test/install targets"
-    print "  -r        # execute SNocscriptFilePath/SNocscript as Python script"
-    print "  -h        # print this help"
-    print "  -c        # execute cleaning"
-    print "  -all      # execute for all dependent projects"
-    print "  --more-warnings or more-warnings=1 # show as many warnings as possible"
-    print "  --warnings-as-errors or warnings-as-errors=1 # treat warns as errors"
-    print "  --no-PROJECT1_PREFIX or without=PROJECT1_PREFIX without=PROJECT2_PREFIX # disable projects compilation"
-    print "        PROJECT1_PREFIX must match to the begining of the project name."
-    print "        PREFIX can start with *, it means that the name should contain this PREFIX"
-    print "  compiler_path=FULL_PATH_TO_THE_COMPILER"
-    print "  linker_path=FULL_PATH_TO_THE_LINKER"
-    print "  cpppath=PATH_TO_INCLUDES1 cpppath=PATH_TO_INCLUDES2"
-    print "  define=\"DEFINITION1=100\" define=DEFINE2"
-    print "  libpath=PATH_TO_LIBRARIES"
-    print "  lib=ADDITIONAL_LIBRARY_NAME"
-    print "  cflag=FLAG1 cxxflag=FLAG2 cppflag=FLAG3 #Compile flags"
-    print "  lflag=FLAG1 lflag=FLAG2   lflag=FLAG3   #Link flags"
-    print "**********************"
-    print "Other options can be SCons specific."
-    print "  If you want to change default path to the sources then"
-    print "  set SNOCS_PROJECTS_SRC_PATH environment variable"
-    print "  If you want to change default installation path then "
-    print "  set SNOCS_INSTALL_LIB_PATH and SNOCS_INSTALL_BIN_PATH environment variables"
-    print "  During 'test' phase snocs updates LD_LIBRARY_PATH local copy to provide"
-    print "  of shared libraries"
-    print "**********************"
+    print("""**********************
+Snocs is a build tool based on SCons Software Construction tool (http://www.scons.org/).
+Usage: snocs [SNocscriptFilePath] [options]
+    print("Examples:
+  snocs .. compiler=vc9 platform=x86 configuration=Debug
+  snocs test -Q           #build and run tests with reduced log
+  snocs install -c        #clean installation
+  snocs icanchangethisdomain/SomeProjectName -r  #run Python script
+SNocscriptFilePath can be absolute, relative to current path, or
+relative to projects root path e.g.:
+  snocs example compiler=vc9 test
+**********************
+Available options:
+  compiler={gcc,gpp,mingw,clangpp,vc9,vc9exp,vc10,vc10exp,vc11,vc11exp,ipp}
+  configuration={Debug,Release}
+  platform={x86,Win32,x64} # Win32 is an alias to x86
+  verbose=0|1|2 # enables scons debug output
+  shared=1|0 #enables building shared libraries for all projects of default config
+  testnorun=0|1 #disables tests run in case of test/install targets
+  -r        # execute SNocscriptFilePath/SNocscript as Python script
+  -h        # print(this help
+  -c        # execute cleaning
+  -all      # execute for all dependent projects
+  --more-warnings or more-warnings=1 # show as many warnings as possible
+  --warnings-as-errors or warnings-as-errors=1 # treat warns as errors
+  --no-PROJECT1_PREFIX or without=PROJECT1_PREFIX without=PROJECT2_PREFIX # disable projects compilation
+        PROJECT1_PREFIX must match to the begining of the project name.
+        PREFIX can start with *, it means that the name should contain this PREFIX
+  compiler_path=FULL_PATH_TO_THE_COMPILER
+  linker_path=FULL_PATH_TO_THE_LINKER
+  cpppath=PATH_TO_INCLUDES1 cpppath=PATH_TO_INCLUDES2
+  define="DEFINITION1=100" define=DEFINE2
+  libpath=PATH_TO_LIBRARIES
+  lib=ADDITIONAL_LIBRARY_NAME
+  cflag=FLAG1 cxxflag=FLAG2 cppflag=FLAG3 #Compile flags
+  lflag=FLAG1 lflag=FLAG2   lflag=FLAG3   #Link flags
+  ld_library_path=/some/path/to/dynamic/lib  ld_library_path=/another/path
+**********************"
+Other options can be SCons specific.
+  If you want to change default path to the sources then
+  set SNOCS_PROJECTS_SRC_PATH environment variable
+  If you want to change default installation path then
+  set SNOCS_INSTALL_LIB_PATH and SNOCS_INSTALL_BIN_PATH environment variables
+  During 'test' phase snocs updates LD_LIBRARY_PATH local copy to provide
+  of shared libraries"
+**********************""")
     
