@@ -1,0 +1,6 @@
+*.prj
+*.dblite
+Release
+Debug
+build
+*.tmp

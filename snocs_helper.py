@@ -255,9 +255,8 @@ def EnsureCopyOfHLSPrj(prg, folder_trgt, targetFullPathToBinDir, env, alias, prj
     return
 
   src = os.path.join(folder_trgt, prj_name)
-  dst = os.path.join(targetFullPathToBinDir, prj_name)
   
-  for t in recursive_install(dst, src, env['prj_env']):
+  for t in recursive_install(targetFullPathToBinDir, src, env['prj_env']):
     env[alias].append(t)
 
   from SCons.Script import Clean
