@@ -10,19 +10,11 @@ from mingw import *
 from default import *
 from vc9 import *
 from clangpp import *
-
-import platform
+from colors import *
 
 #PLEASE change it if you don't want the standard snocs location
 PROJECTS_SRC_PATH = os.getenv('SNOCS_PROJECTS_SRC_PATH', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
 
-if platform.system() == 'Linux':
-    RED='\033[0;31m'
-    GREEN='\033[1;32m'
-    DGREEN='\033[0;32m'
-    NOCOLOR='\033[0m'
-else:
-    DGREEN=NOCOLOR=GREEN=RED=''
 def detectQtDir(platform,QTVER):
   QTDIR = os.environ.get("QTDIR",'')
   if len(QTDIR) == 0:

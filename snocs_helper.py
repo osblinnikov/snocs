@@ -1,6 +1,9 @@
 import os.path
 import shutil
 import copy
+import sys
+from colors import *
+
 # from cogapp import Cog
 join = os.path.join
 #--------------------------------------
@@ -145,7 +148,10 @@ def DefaultLibraryConfig(env, c):
   )
   c['deps'+DepsFunc](env)
   
-  env['scons'].Default(PrefixLibrary(env, c["SRCPATH"], c['libFiles']))
+  if env['SHARED'] == '1':
+    env['scons'].Default(PrefixSharedLibrary(env, c["SRCPATH"], c['libFiles']))
+  else:
+    env['scons'].Default(PrefixLibrary(env, c["SRCPATH"], c['libFiles']))
 
   if c.__contains__('testFiles'):
     #       STATIC TESTS
