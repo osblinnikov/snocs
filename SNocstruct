@@ -1,5 +1,6 @@
 import os.path
 import sys
+from colors import *
 from builder import *
 
 env = prepare_env(ARGUMENTS, ARGLIST)
