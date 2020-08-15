@@ -19,12 +19,12 @@ def prepare_gpp(env):
     env['CPPPATH'].extend([])
     env['CPPDEFINES'].extend([])
     if env['PLATFORM'] == 'x86':
-        env['CPPFLAGS'].extend(['-m32','-fpic','-std=gnu++11']+additionalCPPFLAGS)
+        env['CPPFLAGS'].extend(['-m32','-fpic']+additionalCPPFLAGS)
         env['LINKFLAGS'].extend(['-m32'])
         env['LIBS'].extend([])#'stdc++'
         env['LIBPATH'].extend(['/usr/lib32'])
     elif env['PLATFORM'] == 'x64':
-        env['CPPFLAGS'].extend(['-m64','-fpic','-std=gnu++11']+additionalCPPFLAGS)
+        env['CPPFLAGS'].extend(['-m64','-fpic']+additionalCPPFLAGS)
         env['LINKFLAGS'].extend(['-m64'])
         env['LIBPATH'].extend(['/usr/local/lib64'])
     else:

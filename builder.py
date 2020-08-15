@@ -45,7 +45,7 @@ def prepare_env(ARGUMENTS, ARGLIST):
     #init defaults
     env['SHARED'] = ARGUMENTS.get('shared', '0')
     env['VERBOSE'] = ARGUMENTS.get('verbose', '0')
-    env['CLEANING'] = ARGUMENTS.get('cleaning', '0')
+    env['CLEANING'] = ARGUMENTS.get('cleaning', False)
     env['BUILD_ALL'] = ARGUMENTS.get('build_all', '0')
     env['TESTNORUN'] = ARGUMENTS.get('testnorun', '0')
     env['SNOCSCRIPT'] = ARGUMENTS.get('snocscript', None)

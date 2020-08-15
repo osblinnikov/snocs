@@ -9,5 +9,6 @@
 	#define component
 #endif // WITH_INTEL_HLS
 
+void empty();
 
 #endif // hlsexample_H_

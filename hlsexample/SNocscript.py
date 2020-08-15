@@ -14,11 +14,11 @@ c = {}
 c['PROG_NAME'] = 'hlsexample'
 c['TEST_HLS_PROJECT_NAME'] = 'tests'
 c['MAIN_HLS_PROJECT_NAME'] = 'main'
-c['libFiles'] = []
+c['libFiles'] = ['empty.c']
 c['testFiles'] = ['tests.c']
 c['runFiles'] = ['main.c']
 c['defines'] = []
 c['depsDynamic'] = add_dependencies
 c['depsStatic'] = add_dependencies
-c['runnableOnly'] = True
+c['runnableOnly'] = False
 DefaultLibraryConfig(env,c)

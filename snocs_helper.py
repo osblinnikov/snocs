@@ -22,13 +22,13 @@ def initEnv(env, name):
   return env
 
 def DefaultParentConfig(env,c):
+  c['PROG_NAME'] = 'lib' + c['PROG_NAME']
   testInclDeps(c)
 
+  initEnv(env, c['PROG_NAME'])
   if env['SHARED'] == '1':
-    initEnv(env, c['PROG_NAME'])
     c['depsDynamic'](env)
   else:
-    initEnv(env, c['PROG_NAME']+"_static")
     c['depsStatic'](env)
 
 def enableQtModules(env,c, doBuildUI):
@@ -83,6 +83,7 @@ def testInclDeps(c):
     c['depsDynamic_run'] = defInclDeps
 
 def DefaultLibraryConfig(env, c):
+  c['PROG_NAME'] = 'lib' + c['PROG_NAME']
   forceShared = c.get('forceShared', False)
   forceStatic = c.get('forceStatic', False)
   runnableOnly = c.get('runnableOnly', False)
@@ -172,11 +173,11 @@ def DefaultLibraryConfig(env, c):
     c['deps'+DepsFunc+'_tests'](env)
     c['deps'+DepsFunc](env)
     
-    env['scons'].Default(PrefixTest(env, c["TESTPATH"], c['testFiles']))
+    env['scons'].Default(PrefixTest(env, c["TESTPATH"], c['testFiles'], c))
 
   if c.get('runFiles', False):
     #       SHARED RUN
-    initEnv(env, c['PROG_NAME']+"_run")
+    initEnv(env, c['PROG_NAME'][3:])
 
     enableQtModules(env,c,False)
     env['prj_env'].Append(
@@ -190,7 +191,7 @@ def DefaultLibraryConfig(env, c):
     c['deps'+DepsFunc+'_run'](env)
     c['deps'+DepsFunc](env)
     
-    env['scons'].Default(PrefixProgram(env, c["SRCPATH"], c['runFiles']))
+    env['scons'].Default(PrefixProgram(env, c["SRCPATH"], c['runFiles'], c))
 
   env['SHARED'] = SHARED_VAR_BCP
 
@@ -208,12 +209,11 @@ def isProjectDisabled(env):
   return False
 
 
-def EnsureCleanup(target, folder):
-  from SCons.Script import Clean
-  Clean(target, folder)
+def EnsureCleanup(env, target, folder):
+  env['prj_env'].Clean(target, folder)
 
 
-def EnsureEmptyFoldersCleanup(target, folder_trgt):
+def EnsureEmptyFoldersCleanup(env, target, folder_trgt):
   anyfiles = False
   allempty_subfolders = []
   for root, dirs, files in os.walk(folder_trgt):
@@ -222,13 +222,14 @@ def EnsureEmptyFoldersCleanup(target, folder_trgt):
       allempty_subfolders.append(root)
   if not anyfiles and os.path.isdir(folder_trgt):
     allempty_subfolders.append(folder_trgt)
+    import shutil
+    shutil.rmtree(folder_trgt)
   
   if allempty_subfolders:
-    print("Empty subtree found, register for cleanup", allempty_subfolders)
+    print("Empty subtree found, register for cleanup", DGREEN, allempty_subfolders, NOCOLOR)
 
-  from SCons.Script import Clean
   for folder in allempty_subfolders:
-    Clean(target, folder) 
+    env['prj_env'].Clean(target, folder) 
 
 
 def recursive_install(target, source, env):
@@ -240,11 +241,11 @@ def recursive_install(target, source, env):
                 os.path.join(root, filename))
 
 
-def EnsureCopyOfHLSPrj(prg, folder_trgt, targetFullPathToBinDir, env, alias, prj_name):
+def EnsureCopyOfHLSPrj(prg, targetFullPathToBinFile, folder_trgt, targetFullPathToBinDir, env, alias, prj_name):
   if env['CC'] != 'i++' or env['PLATFORM'] == 'x64':
     return
   prj_name = prj_name + ".prj" if prj_name and not prj_name.endswith(".prj") else prj_name
-  prj_name = folder_trgt + prj_name if prj_name else None
+  prj_name = os.path.join(folder_trgt, prj_name) if prj_name else None
 
   if not prj_name:
     for root, dirs, files in os.walk(folder_trgt):
@@ -254,13 +255,19 @@ def EnsureCopyOfHLSPrj(prg, folder_trgt, targetFullPathToBinDir, env, alias, prj
   if not prj_name:
     return
 
-  src = os.path.join(folder_trgt, prj_name)
-  
+  src = prj_name
+  # if not os.path.isdir(src):
+  #   copyDirAction = env['prj_env'].CopyDirectory(targetFullPathToBinDir, src)
+  #   # env[alias].append(copyDirAction)
+  #   env['prj_env'].AddPreAction(prg, copyDirAction)
+    
+  # else:
+  # print(RED, alias, targetFullPathToBinDir, src, NOCOLOR)
   for t in recursive_install(targetFullPathToBinDir, src, env['prj_env']):
     env[alias].append(t)
+    env['prj_env'].Requires(prg, t)
 
-  from SCons.Script import Clean
-  Clean(prg, src)
+  return src
 
 
 def PrefixProgram(env, folder, srcs, c=None):
@@ -269,17 +276,15 @@ def PrefixProgram(env, folder, srcs, c=None):
   c = c if c else {}
   abs_script_path = os.path.abspath(env['SNOCSCRIPT_PATH'])
   
+  static_target = 'shared' if env['SHARED'] == '1' else 'static'
   trgt = env['PROG_NAME']
-  if env['SHARED'] == '0':
-    trgt = trgt + '_static'
-
-  targetWithArch = trgt + env['ARCHITECTURE_CODE']    
+  targetWithArch = static_target + env['ARCHITECTURE_CODE']    
   targetFullPath = os.path.join(env['SNOCSCRIPT_PATH'], targetWithArch)
   targetFullPathToBinDir = os.path.join(env['BIN_DIR'], targetWithArch)
   targetFullPathToBinFile = os.path.join(targetFullPathToBinDir, trgt)
   targetFullPathToInstall = os.path.join(env['INSTALL_BIN_PATH'], targetWithArch)
   
-  folder_trgt = os.path.join(abs_script_path, 'build', targetWithArch+"_"+env['CONFIGURATION']+'.tmp', folder)
+  folder_trgt = os.path.join(abs_script_path, 'build', targetWithArch + "_" + env['CONFIGURATION']+'.tmp', folder)
   folder = os.path.join(abs_script_path, folder)
   env['prj_env'].VariantDir(folder_trgt, folder, duplicate=0)
   
@@ -291,21 +296,25 @@ def PrefixProgram(env, folder, srcs, c=None):
     env['prj_env'].Append(PDB = targetFullPathToBinFile+ '.pdb')
   
   # print(srcs)
-  prg = env['APP_BUILD'][targetFullPath] = env['prj_env'].Program(
+  prg = env['prj_env'].Program(
     target = targetFullPathToBinFile, 
     source = srcs, 
     LINKCOM  = [env['prj_env']['LINKCOM']]+linkom
   )
-  EnsureCopyOfHLSPrj(prg, folder_trgt, targetFullPathToInstall, env, 'INSTALL_ALIASES', c.get('MAIN_HLS_PROJECT_NAME', False))
-  env['INSTALL_ALIASES'].append(env['prj_env'].Install(targetFullPathToInstall, env['APP_BUILD'][targetFullPath]))#setup install directory
 
-  EnsureCleanup(prg, targetFullPathToBinDir)
-  EnsureCleanup(prg, targetFullPathToInstall)
-  EnsureEmptyFoldersCleanup(prg, os.path.split(env['BIN_DIR'])[0])
-  EnsureEmptyFoldersCleanup(prg, os.path.split(env['INSTALL_BIN_PATH'])[0])
-  EnsureEmptyFoldersCleanup(prg, os.path.join(abs_script_path, 'build'))
+  install_target = env['prj_env'].Install(targetFullPathToInstall, prg)
+  hls_src = EnsureCopyOfHLSPrj(install_target, targetFullPathToBinFile, folder_trgt, targetFullPathToInstall, env, 'INSTALL_ALIASES', c.get('MAIN_HLS_PROJECT_NAME', False))
+  env['INSTALL_ALIASES'].append(install_target)#setup install directory
 
-  return env['APP_BUILD'][targetFullPath]
+  if env['CLEANING']:
+    EnsureCleanup(env, prg, hls_src)
+    EnsureCleanup(env, prg, targetFullPathToBinDir)
+    EnsureCleanup(env, prg, targetFullPathToInstall)
+    EnsureEmptyFoldersCleanup(env, prg, os.path.split(env['BIN_DIR'])[0])
+    EnsureEmptyFoldersCleanup(env, install_target, os.path.split(env['INSTALL_BIN_PATH'])[0])
+    EnsureEmptyFoldersCleanup(env, prg, os.path.join(abs_script_path, 'build'))
+  env['APP_BUILD'][targetFullPath] = prg
+  return prg
 
 def PrefixTest(env, folder, srcs, c=None):
   if isProjectDisabled(env):
@@ -314,15 +323,14 @@ def PrefixTest(env, folder, srcs, c=None):
 
   abs_script_path = os.path.abspath(env['SNOCSCRIPT_PATH'])
   
+  static_target = 'shared' if env['SHARED'] == '1' else 'static'
   trgt = env['PROG_NAME']
-  if env['SHARED'] == '0':
-    trgt = trgt + '_static'
+  targetWithArch = static_target + env['ARCHITECTURE_CODE']
 
-  targetWithArch = trgt + env['ARCHITECTURE_CODE']    
   targetFullPath = os.path.join(env['SNOCSCRIPT_PATH'], targetWithArch)
   targetFullPathToBinDir = os.path.join(env['BIN_DIR'], targetWithArch)
   targetFullPathToBinFile = os.path.join(targetFullPathToBinDir, trgt)
-  targetFullPathToInstall = os.path.join(env['INSTALL_BIN_PATH'], targetWithArch)
+  targetFullPathToInstall = os.path.join(env['INSTALL_BIN_PATH'], targetWithArch, '')
   testPassedFullPath = targetFullPathToBinFile + ".passed"
 
   folder_trgt = os.path.join(abs_script_path, 'build', targetWithArch+"_"+env['CONFIGURATION']+'.tmp', folder)
@@ -336,19 +344,24 @@ def PrefixTest(env, folder, srcs, c=None):
   if env['MSVC_PDB']:
     env['prj_env'].Append(PDB = targetFullPathToBinFile + '.pdb' )
 
-  prg = env['APP_BUILD'][targetFullPath] = env['prj_env'].Program(target = targetFullPathToBinFile, source = srcs, LINKCOM  = [env['prj_env']['LINKCOM']]+linkom)
-  EnsureCopyOfHLSPrj(prg, folder_trgt, targetFullPathToInstall, env, 'INSTALL_ALIASES', c.get('TEST_HLS_PROJECT_NAME', False))
-  env['INSTALL_ALIASES'].append(env['prj_env'].Install(targetFullPathToInstall, env['APP_BUILD'][targetFullPath]))#setup install directory
+  prg = env['prj_env'].Program(target = targetFullPathToBinFile, source = srcs, LINKCOM  = [env['prj_env']['LINKCOM']]+linkom)
+  test_target = env['prj_env'].Test(testPassedFullPath, prg)
+  install_target = env['prj_env'].Install(targetFullPathToInstall, prg)
 
-  EnsureCopyOfHLSPrj(prg, folder_trgt, targetFullPathToBinDir, env, 'TEST_ALIASES', c.get('TEST_HLS_PROJECT_NAME', False))
-  env['TEST_ALIASES'].append(env['prj_env'].Test(testPassedFullPath, env['APP_BUILD'][targetFullPath]))
+  env['INSTALL_ALIASES'].append(install_target)#setup install directory
+  env['TEST_ALIASES'].append(test_target)
 
-  EnsureCleanup(prg, targetFullPathToBinDir)
-  EnsureCleanup(prg, targetFullPathToInstall)
+  hls_src2 = EnsureCopyOfHLSPrj(test_target, targetFullPathToBinFile, folder_trgt, targetFullPathToBinDir, env, 'TEST_ALIASES', c.get('TEST_HLS_PROJECT_NAME', False))
+  hls_src1 = EnsureCopyOfHLSPrj(install_target, targetFullPathToBinFile, folder_trgt, targetFullPathToInstall, env, 'INSTALL_ALIASES', c.get('TEST_HLS_PROJECT_NAME', False))
 
-  EnsureEmptyFoldersCleanup(prg, os.path.split(env['BIN_DIR'])[0])
-
-  return env['APP_BUILD'][targetFullPath]
+  if env['CLEANING']:
+    EnsureCleanup(env, prg, hls_src1)
+    EnsureCleanup(env, prg, hls_src2)
+    EnsureCleanup(env, prg, targetFullPathToBinDir)
+    EnsureCleanup(env, prg, targetFullPathToInstall)
+    EnsureEmptyFoldersCleanup(env, prg, os.path.split(env['BIN_DIR'])[0])
+  env['APP_BUILD'][targetFullPath] = prg
+  return prg
 
 # Similar to PrefixProgram above, except for Library
 def PrefixLibrary(env, folder, srcs):
@@ -356,10 +369,11 @@ def PrefixLibrary(env, folder, srcs):
     return
   abs_script_path = os.path.abspath(env['SNOCSCRIPT_PATH'])
   
+  static_target = 'shared' if env['SHARED'] == '1' else 'static'
   trgt = env['PROG_NAME']
-  if env['SHARED'] == '0':
-    trgt = trgt + '_static'
-  folder_trgt = os.path.join(abs_script_path, 'build', trgt+env['ARCHITECTURE_CODE']+"_"+env['CONFIGURATION']+'.tmp', folder)
+  targetWithArch = static_target + env['ARCHITECTURE_CODE']
+
+  folder_trgt = os.path.join(abs_script_path, 'build', targetWithArch+"_"+env['CONFIGURATION']+'.tmp', folder)
   folder = os.path.join(abs_script_path, folder)
   env['prj_env'].VariantDir(folder_trgt, folder, duplicate=0)
   
@@ -368,9 +382,10 @@ def PrefixLibrary(env, folder, srcs):
     env['prj_env'].Append(PDB = os.path.join( env['LIB_DIR'], trgt+env['ARCHITECTURE_CODE'] + '.pdb' ))
   targetFullPath = os.path.join(env['SNOCSCRIPT_PATH'],trgt+env['ARCHITECTURE_CODE'])
   targetFullPathToBin = os.path.join(env['LIB_DIR'],trgt+env['ARCHITECTURE_CODE'])
-  env['APP_BUILD'][targetFullPath] = env['prj_env'].Library(target = targetFullPathToBin, source = srcs)
-  env['INSTALL_ALIASES'].append(env['prj_env'].Install(env['INSTALL_LIB_PATH'], env['APP_BUILD'][targetFullPath]))#setup install directory
-  return env['APP_BUILD'][targetFullPath]
+  prg = env['prj_env'].Library(target = targetFullPathToBin, source = srcs)
+  env['INSTALL_ALIASES'].append(env['prj_env'].Install(env['INSTALL_LIB_PATH'], prg))#setup install directory
+  env['APP_BUILD'][targetFullPath] = prg
+  return prg
   
 # Similar to PrefixProgram above, except for SharedLibrary
 def PrefixSharedLibrary(env, folder, srcs):
@@ -378,22 +393,33 @@ def PrefixSharedLibrary(env, folder, srcs):
     return
   abs_script_path = os.path.abspath(env['SNOCSCRIPT_PATH'])
   
+  static_target = 'shared' if env['SHARED'] == '1' else 'static'
   trgt = env['PROG_NAME']
-  if env['SHARED'] == '0':
-    trgt = trgt + '_static'
-  folder_trgt = os.path.join(abs_script_path, 'build', trgt+env['ARCHITECTURE_CODE']+"_"+env['CONFIGURATION']+'.tmp', folder)
+  targetWithArch = static_target + env['ARCHITECTURE_CODE']
+
+  folder_trgt = os.path.join(abs_script_path, 'build', targetWithArch+"_"+env['CONFIGURATION']+'.tmp', folder)
   folder = os.path.join(abs_script_path, folder)
   env['prj_env'].VariantDir(folder_trgt, folder, duplicate=0)
   
   srcs = PrefixSources(env, folder_trgt, srcs)
-  linkom = []
+  linkom = [env['prj_env']['LINKCOM']]
   if env['MSVC_VERSION'] != None and float(env['MSVC_VERSION'].translate(None, 'Exp')) < 11:
     linkom = ['mt.exe -nologo -manifest ${TARGET}.manifest -outputresource:$TARGET;2']
+  
   if env['MSVC_PDB']:
     env['prj_env'].Append(PDB = os.path.join( env['LIB_DIR'], trgt+env['ARCHITECTURE_CODE'] + '.pdb' ))
+  
+  if env['CC'] == 'i++':
+    env['prj_env']['CC'] = 'g++'
+    env['prj_env']['CCFLAGS'] = list(filter(lambda s:  '-march' not in s and '-g0' not in s, env['prj_env']['CCFLAGS']))
+    if env['CONFIGURATION'] == 'Debug':
+        env['CPPFLAGS'].extend(['-g'])
+    env['prj_env']['LINKFLAGS'] = list(filter(lambda s: '-march' not in s, env['prj_env']['LINKFLAGS']))
+    env['prj_env']['CPPDEFINES'] = list(filter(lambda s: 'WITH_INTEL_HLS' not in s, env['prj_env']['CPPDEFINES']))
+
   targetFullPath = os.path.join(env['SNOCSCRIPT_PATH'],trgt+env['ARCHITECTURE_CODE'])
   targetFullPathToBin = os.path.join(env['LIB_DIR'],trgt+env['ARCHITECTURE_CODE'])
-  env['APP_BUILD'][targetFullPath] = env['prj_env'].SharedLibrary(target = targetFullPathToBin, source = srcs, LINKCOM  = [env['prj_env']['LINKCOM']]+linkom) 
+  env['APP_BUILD'][targetFullPath] = env['prj_env'].SharedLibrary(target = targetFullPathToBin, source = srcs, LINKCOM  = linkom) 
   env['INSTALL_ALIASES'].append(env['prj_env'].Install(env['INSTALL_LIB_PATH'], env['APP_BUILD'][targetFullPath]))#setup install directory
   return env['APP_BUILD'][targetFullPath]
 
@@ -409,6 +435,8 @@ def PrefixSources(env, srcdir, srcs):
         p = os.path.join(env['SNOCSCRIPT_PATH'], x[3:])
       elif x.startswith("./"):
         p = os.path.join(env['SNOCSCRIPT_PATH'], x[2:])
+      elif x.startswith("/"):
+        p = env['PROJECTS_SRC_PATH'] + x
       else:
         p = os.path.join(env['SNOCSCRIPT_PATH'],srcdir, x)
 
@@ -435,16 +463,16 @@ def AddDependencyConfig(env, dep, deppath, ccflags=None, linkflags=None):
   )
 
 def AddDependency(env, dep, deppath):
-  if env['SHARED'] == '0':
-    dep = dep + '_static'
+  # if env['SHARED'] == '0':
+  #   dep = dep + '_static'
   deppath = os.path.abspath(os.path.join(env['PROJECTS_SRC_PATH'],deppath))
   AddOrdering(env,dep,deppath)
   AddDependencyConfig(env,dep, deppath)
   
 def AddOrdering(env, dep, deppath):
   prog = env['PROG_NAME']
-  if env['SHARED'] == '0':
-    prog = prog + '_static'
+  # if env['SHARED'] == '0':
+  #   prog = prog + '_static'
   #print(prog+"->"+dep)
   prog = os.path.join(env['SNOCSCRIPT_PATH'],prog+env['ARCHITECTURE_CODE'])
   if env['APP_DEPENDENCIES'].get(prog) == None:

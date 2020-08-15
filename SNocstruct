@@ -108,8 +108,9 @@ if env['BUILD_ALL'] == '1':
         for dep in env['APP_DEPENDENCIES'][prog]:
             # print prog+" depending on "+dep
             if env['APP_BUILD'].__contains__(prog) and env['APP_BUILD'].__contains__(dep):
-                Requires(env['APP_BUILD'][prog], env['APP_BUILD'][dep])
+                Depends(env['APP_BUILD'][prog], env['APP_BUILD'][dep])
 
 env['INSTALL_ALIASES'].append( env['TEST_ALIASES'] )
+
 Alias('test', env['TEST_ALIASES'])#run when test command provided in command line
 Alias('install', env['INSTALL_ALIASES'])#run when install command provided in command line
