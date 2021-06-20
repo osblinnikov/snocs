@@ -303,7 +303,7 @@ def PrefixProgram(env, folder, srcs, c=None):
   )
 
   install_target = env['prj_env'].Install(targetFullPathToInstall, prg)
-  hls_src = EnsureCopyOfHLSPrj(install_target, targetFullPathToBinFile, folder_trgt, targetFullPathToInstall, env, 'INSTALL_ALIASES', c.get('MAIN_HLS_PROJECT_NAME', False))
+  hls_src = EnsureCopyOfHLSPrj(install_target, targetFullPathToBinFile, folder_trgt, targetFullPathToInstall, env, 'INSTALL_ALIASES', c.get('MAIN_HLS_PROJECT_NAME', 'main'))
   env['INSTALL_ALIASES'].append(install_target)#setup install directory
 
   if env['CLEANING']:
@@ -351,8 +351,8 @@ def PrefixTest(env, folder, srcs, c=None):
   env['INSTALL_ALIASES'].append(install_target)#setup install directory
   env['TEST_ALIASES'].append(test_target)
 
-  hls_src2 = EnsureCopyOfHLSPrj(test_target, targetFullPathToBinFile, folder_trgt, targetFullPathToBinDir, env, 'TEST_ALIASES', c.get('TEST_HLS_PROJECT_NAME', False))
-  hls_src1 = EnsureCopyOfHLSPrj(install_target, targetFullPathToBinFile, folder_trgt, targetFullPathToInstall, env, 'INSTALL_ALIASES', c.get('TEST_HLS_PROJECT_NAME', False))
+  hls_src2 = EnsureCopyOfHLSPrj(test_target, targetFullPathToBinFile, folder_trgt, targetFullPathToBinDir, env, 'TEST_ALIASES', c.get('TEST_HLS_PROJECT_NAME', 'tests'))
+  hls_src1 = EnsureCopyOfHLSPrj(install_target, targetFullPathToBinFile, folder_trgt, targetFullPathToInstall, env, 'INSTALL_ALIASES', c.get('TEST_HLS_PROJECT_NAME', 'tests'))
 
   if env['CLEANING']:
     EnsureCleanup(env, prg, hls_src1)

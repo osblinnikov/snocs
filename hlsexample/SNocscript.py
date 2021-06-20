@@ -12,8 +12,6 @@ def add_dependencies(env):
 
 c = {}
 c['PROG_NAME'] = 'hlsexample'
-c['TEST_HLS_PROJECT_NAME'] = 'tests'
-c['MAIN_HLS_PROJECT_NAME'] = 'main'
 c['libFiles'] = ['empty.c']
 c['testFiles'] = ['tests.c']
 c['runFiles'] = ['main.c']
