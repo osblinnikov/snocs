@@ -242,7 +242,7 @@ def recursive_install(target, source, env):
 
 
 def EnsureCopyOfHLSPrj(prg, targetFullPathToBinFile, folder_trgt, targetFullPathToBinDir, env, alias, prj_name):
-  if env['CC'] != 'i++' or env['PLATFORM'] == 'x64':
+  if env.get('CC', '') != 'i++' or env['PLATFORM'] == 'x64':
     return
   prj_name = prj_name + ".prj" if prj_name and not prj_name.endswith(".prj") else prj_name
   prj_name = os.path.join(folder_trgt, prj_name) if prj_name else None

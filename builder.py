@@ -43,6 +43,8 @@ def prepare_env(ARGUMENTS, ARGLIST):
         env[k.upper()] = v
 
     #init defaults
+    env['ARGUMENTS'] = ARGUMENTS
+    env['ARGLIST'] = ARGLIST
     env['SHARED'] = ARGUMENTS.get('shared', '0')
     env['VERBOSE'] = ARGUMENTS.get('verbose', '0')
     env['CLEANING'] = ARGUMENTS.get('cleaning', False)
@@ -85,7 +87,6 @@ def prepare_env(ARGUMENTS, ARGLIST):
     env['LINKFLAGS'] = []
     env['CCFLAGS'] = []
     env['CPPFLAGS'] = []
-    env['CXXFLAGS'] = []
     env['LIBS'] = []
     env['LIBPATH']=[
         env['INSTALL_LIB_PATH']
@@ -162,7 +163,6 @@ def prepare_env(ARGUMENTS, ARGLIST):
     env['CPPPATH'].extend(findArgs(ARGLIST,'cpppath'))
     env['CPPDEFINES'].extend(findArgs(ARGLIST,'define'))
     env['CCFLAGS'].extend(findArgs(ARGLIST,'cflag'))
-    env['CXXFLAGS'].extend(findArgs(ARGLIST,'cxxflag'))
     env['CPPFLAGS'].extend(findArgs(ARGLIST,'cppflag'))
     env['LINKFLAGS'].extend(findArgs(ARGLIST,'lflag'))
     env['LIBPATH'].extend(findArgs(ARGLIST,'libpath'))

@@ -6,6 +6,8 @@ from builder import *
 env = prepare_env(ARGUMENTS, ARGLIST)
 
 env['scons'] = Environment(
+    ARGUMENTS = env['ARGUMENTS'],
+    ARGLIST = env['ARGLIST'],
     TESTNORUN = env['TESTNORUN'],
     BUILDERS = {'Test' :  Builder(action = builder_unit_test)},
     TOOLS  = env['TOOLS'],    
@@ -23,7 +25,7 @@ for path in env['LD_LIBRARY_PATH']:
     env['scons'].AppendENVPath('LD_LIBRARY_PATH', path)
     env['scons'].AppendENVPath('PATH', path)
 
-verbosity =  int(env['VERBOSE'])
+verbosity =  int(env['VERBOSE'] or 'verbose=1' in sys.argv)
 if verbosity == 0:
     env['scons']['CCCOMSTR'] = GREEN+"Compiling $SOURCES"+NOCOLOR
     env['scons']['CXXCOMSTR'] = GREEN+"Compiling $SOURCES"+NOCOLOR
@@ -31,13 +33,15 @@ if verbosity == 0:
     env['scons']['ARCOMSTR'] = GREEN+"Archieving $TARGET"+NOCOLOR
     env['scons']['RANLIBCOMSTR'] = GREEN+"Indexing $TARGET"+NOCOLOR
     env['scons']['SHCCCOMSTR'] = GREEN+"Compiling shared object $TARGET"+NOCOLOR
+    env['scons']['SHCXXCOMSTR'] = GREEN+"Compiling shared object $TARGET"+NOCOLOR
 elif verbosity == 1:
-    env['scons']['CCCOMSTR'] = GREEN+"Compiling $TARGET $SOURCES"+NOCOLOR
-    env['scons']['CXXCOMSTR'] = GREEN+"Compiling $TARGET $SOURCES"+NOCOLOR
+    env['scons']['CCCOMSTR'] = GREEN+"$CC -c $CCFLAGS $CPPFLAGS $CPPPATH $SOURCES  -o $TARGET"+NOCOLOR
+    env['scons']['CXXCOMSTR'] = GREEN+"$CC -c $CCFLAGS $CPPFLAGS $CPPPATH $SOURCES -o $TARGET"+NOCOLOR
     env['scons']['LINKCOMSTR'] = GREEN+"Linking $TARGET $LINKFLAGS"+NOCOLOR
     env['scons']['ARCOMSTR'] = GREEN+"Archieving $TARGET $LINKFLAGS"+NOCOLOR
     env['scons']['RANLIBCOMSTR'] = GREEN+"Indexing $TARGET $LINKFLAGS"+NOCOLOR
     env['scons']['SHCCCOMSTR'] = GREEN+"Compiling shared object $TARGET $LINKFLAGS"+NOCOLOR
+    env['scons']['SHCXXCOMSTR'] = GREEN+"Compiling shared object $TARGET $LINKFLAGS"+NOCOLOR
 else:
     Progress(GREEN+'Evaluating $TARGET\n'+NOCOLOR)
 
@@ -48,10 +52,8 @@ if env.__contains__('CC') and env['CC'] != None:
     env['scons'].Replace(CC=env['CC'])
 if env.__contains__('CXX') and env['CXX'] != None:
     env['scons'].Replace(CXX=env['CXX'])
-if env.__contains__('CXXFLAGS') and env['CXXFLAGS'] != None:
-    env['scons'].Replace(CXXFLAGS=env['CXXFLAGS'])
 if env.__contains__('CPPFLAGS') and env['CPPFLAGS'] != None:
-    env['scons'].Replace(CPPFLAGS=env['CPPFLAGS'])    
+    env['scons'].Replace(CPPFLAGS=env['CPPFLAGS'])
 if env.__contains__('LINK') and env['LINK'] != None:
     env['scons'].Replace(LINK=env['LINK'])
 if env.__contains__('AR') and env['AR'] != None:
