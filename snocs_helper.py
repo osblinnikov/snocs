@@ -11,14 +11,10 @@ join = os.path.join
 #--------------------------------------
 
 def initEnv(env, name):
-  # scons = env['scons']
-  # bcp = env['bcp']
-  # env = copy.deepcopy(env['bcp'])
-  # env['bcp'] = bcp
-  # env['scons'] = scons
   env['SNOCSCRIPT_PATH'] = os.path.abspath(os.path.dirname(env['SNOCSCRIPT']))
   env['PROG_NAME'] = name
   env['prj_env'] = env['scons'].Clone()
+  env['prj_env']['CPPPATH'].append(env['SNOCSCRIPT_PATH'])
   return env
 
 def DefaultParentConfig(env,c):
@@ -61,7 +57,7 @@ def enableQtModules(env,c, doBuildUI):
         env['prj_env'].Uic4(s)
   # return addPaths
 
-def funcInclDeps(env):
+def funcInclDeps(env, run):
   return
 
 def testInclDeps(c):
@@ -101,22 +97,6 @@ def DefaultLibraryConfig(env, c):
     DepsFunc = 'Static'
     c['STATIC_DEFINES'] = [(c['PROG_NAME']+"_STATIC").upper()]
 
-  if not c.__contains__("CCFLAGS"):
-    c['CCFLAGS'] = env['CCFLAGS']
-
-  if not c.__contains__("LINKFLAGS"):
-    c['LINKFLAGS'] = env['LINKFLAGS']
-
-  if not c.__contains__("CPPPATH"):
-    c['CPPPATH'] = []
-  c['CPPPATH'].append(env['SNOCSCRIPT_PATH'])
-
-  if not c.__contains__("CPPDEFINES"):
-    c['CPPDEFINES'] = []
-
-  if c.__contains__("defines"):
-    c['CPPDEFINES'] += c["defines"]
-
   if not c.__contains__("SRCPATH"):
     c["SRCPATH"] = "src"
   c["SRCPATH"] = os.path.join(*c["SRCPATH"].split("/"))
@@ -148,8 +128,7 @@ def DefaultLibraryConfig(env, c):
 
     enableQtModules(env,c,True)
     
-    replace_env_with_config(env, c)
-    c['deps'+DepsFunc](env)
+    c['deps'+DepsFunc](env, 'lib')
     
     if env['SHARED'] == '1':
       env['scons'].Default(PrefixSharedLibrary(env, c["SRCPATH"], c['libFiles']))
@@ -161,14 +140,12 @@ def DefaultLibraryConfig(env, c):
     initEnv(env, c['PROG_NAME']+"_test")
 
     enableQtModules(env,c,False)
-    
-    replace_env_with_config(env, c)
 
     if not runnableOnly:
       AddDependency(env, c['PROG_NAME'], env['SNOCSCRIPT_PATH'])
 
-    c['deps'+DepsFunc+'_tests'](env)
-    c['deps'+DepsFunc](env)
+    c['deps'+DepsFunc+'_tests'](env, 'test')
+    c['deps'+DepsFunc](env, 'test')
     
     env['scons'].Default(PrefixTest(env, c["TESTPATH"], c['testFiles'], c))
 
@@ -178,32 +155,16 @@ def DefaultLibraryConfig(env, c):
 
     enableQtModules(env,c,False)
     
-    replace_env_with_config(env, c)
     if not runnableOnly:
       AddDependency(env, c['PROG_NAME'], env['SNOCSCRIPT_PATH'])
     
-    c['deps'+DepsFunc+'_run'](env)
-    c['deps'+DepsFunc](env)
+    c['deps'+DepsFunc+'_run'](env, 'run')
+    c['deps'+DepsFunc](env, 'run')
     
     env['scons'].Default(PrefixProgram(env, c["SRCPATH"], c['runFiles'], c))
 
   env['SHARED'] = SHARED_VAR_BCP
 
-def replace_env_with_config(env, c):
-  if c.get("CC"):
-    env['prj_env'].Replace(CC = c['CC'])
-  if c.get("TOOLS"):
-    env['prj_env'].Replace(TOOLS = c['TOOLS'])
-  if c.get("CPPPATH"):
-    env['prj_env'].Replace(CPPPATH = c['CPPPATH'])
-  if c.get("CPPDEFINES"):
-    env['prj_env'].Replace(CPPDEFINES = c['CPPDEFINES']+c['STATIC_DEFINES'])
-  if c.get("CCFLAGS"):
-    env['prj_env'].Replace(CCFLAGS = c['CCFLAGS'] + c.get('CCFLAGSTest', []))
-  if c.get("CPPFLAGS"):
-    env['prj_env'].Replace(CPPFLAGS = c['CPPFLAGS'] + c.get('CPPFLAGSTest', []))
-  if c.get("LINKFLAGS"):
-    env['prj_env'].Replace(LINKFLAGS = c['LINKFLAGS'] + c.get('LINKFLAGSTest', []))
 
 def isProjectDisabled(env):
   # print(env['WITHOUT'])

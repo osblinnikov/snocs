@@ -35,11 +35,11 @@ if verbosity == 0:
     env['scons']['SHCCCOMSTR'] = GREEN+"Compiling shared object $TARGET"+NOCOLOR
     env['scons']['SHCXXCOMSTR'] = GREEN+"Compiling shared object $TARGET"+NOCOLOR
 elif verbosity == 1:
-    env['scons']['CCCOMSTR'] = GREEN+"$CC -c $CCFLAGS $CPPFLAGS $CPPPATH $SOURCES  -o $TARGET"+NOCOLOR
-    env['scons']['CXXCOMSTR'] = GREEN+"$CC -c $CCFLAGS $CPPFLAGS $CPPPATH $SOURCES -o $TARGET"+NOCOLOR
-    env['scons']['LINKCOMSTR'] = GREEN+"Linking $TARGET $LINKFLAGS"+NOCOLOR
-    env['scons']['ARCOMSTR'] = GREEN+"Archieving $TARGET $LINKFLAGS"+NOCOLOR
-    env['scons']['RANLIBCOMSTR'] = GREEN+"Indexing $TARGET $LINKFLAGS"+NOCOLOR
+    env['scons']['CCCOMSTR'] = GREEN+"Compiling $CC -c $CCFLAGS $CPPFLAGS $CPPPATH $SOURCES  -o $TARGET"+NOCOLOR
+    env['scons']['CXXCOMSTR'] = GREEN+"Compiling $CC -c $CCFLAGS $CPPFLAGS $CPPPATH $SOURCES -o $TARGET"+NOCOLOR
+    env['scons']['LINKCOMSTR'] = GREEN+"Linking $LINK $TARGET $LINKFLAGS $LIBPATH $LIBS"+NOCOLOR
+    env['scons']['ARCOMSTR'] = GREEN+"Archieving $TARGET $LINKFLAGS $LIBPATH $LIBS"+NOCOLOR
+    env['scons']['RANLIBCOMSTR'] = GREEN+"Indexing $TARGET $LINKFLAGS $LIBPATH $LIBS"+NOCOLOR
     env['scons']['SHCCCOMSTR'] = GREEN+"Compiling shared object $TARGET $LINKFLAGS"+NOCOLOR
     env['scons']['SHCXXCOMSTR'] = GREEN+"Compiling shared object $TARGET $LINKFLAGS"+NOCOLOR
 else:

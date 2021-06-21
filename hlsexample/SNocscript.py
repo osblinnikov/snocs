@@ -3,7 +3,7 @@ from snocs_helper import *
 #           Environment
 Import( 'env' )
 
-def add_dependencies(env):
+def add_dependencies(env, run):
 	pass
     # AddDependency(env,'libcaf_core','github.com/actor-framework/libcaf_core')
     # AddPthreads(env)
