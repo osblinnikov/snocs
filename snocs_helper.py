@@ -88,22 +88,24 @@ def DefaultLibraryConfig(env, c):
   forceStatic = c.get('forceStatic', False)
   runnableOnly = c.get('runnableOnly', False)
 
-  LIB_DEFINES = []
-  STATIC_DEFINES = []
+  c['STATIC_DEFINES'] = []
   DepsFunc = ''
 
   SHARED_VAR_BCP = env['SHARED']
   if env['SHARED'] == '1' or (forceShared and (not forceStatic)):
     env['SHARED'] = '1' #TEMPORARILY REPLACE SHARED VARIABLE, WILL REPLCE BACK AT THE END OF THIS FUNCTION
     DepsFunc = 'Dynamic'
-    LIB_DEFINES = [(c['PROG_NAME']+"_EXPORT").upper()]
+    c['STATIC_DEFINES'] = [(c['PROG_NAME']+"_EXPORT").upper()]
   else:
     env['SHARED'] = '0'  #TEMPORARILY REPLACE SHARED VARIABLE, WILL REPLCE BACK AT THE END OF THIS FUNCTION
     DepsFunc = 'Static'
-    STATIC_DEFINES = [(c['PROG_NAME']+"_STATIC").upper()]
+    c['STATIC_DEFINES'] = [(c['PROG_NAME']+"_STATIC").upper()]
 
   if not c.__contains__("CCFLAGS"):
     c['CCFLAGS'] = env['CCFLAGS']
+
+  if not c.__contains__("LINKFLAGS"):
+    c['LINKFLAGS'] = env['LINKFLAGS']
 
   if not c.__contains__("CPPPATH"):
     c['CPPPATH'] = []
@@ -145,11 +147,8 @@ def DefaultLibraryConfig(env, c):
     initEnv(env, c['PROG_NAME'])
 
     enableQtModules(env,c,True)
-    env['prj_env'].Append( 
-      CPPPATH = c['CPPPATH'],
-      CPPDEFINES = c['CPPDEFINES']+LIB_DEFINES+STATIC_DEFINES,
-      CCFLAGS = c['CCFLAGS'] + c.get('CCFLAGSLib', [])
-    )
+    
+    replace_env_with_config(env, c)
     c['deps'+DepsFunc](env)
     
     if env['SHARED'] == '1':
@@ -162,11 +161,9 @@ def DefaultLibraryConfig(env, c):
     initEnv(env, c['PROG_NAME']+"_test")
 
     enableQtModules(env,c,False)
-    env['prj_env'].Append(
-      CPPPATH = c['CPPPATH'],
-      CPPDEFINES = c['CPPDEFINES']+STATIC_DEFINES,
-      CCFLAGS = c['CCFLAGS'] + c.get('CCFLAGSTest', [])
-    )
+    
+    replace_env_with_config(env, c)
+
     if not runnableOnly:
       AddDependency(env, c['PROG_NAME'], env['SNOCSCRIPT_PATH'])
 
@@ -180,11 +177,8 @@ def DefaultLibraryConfig(env, c):
     initEnv(env, c['PROG_NAME'][3:])
 
     enableQtModules(env,c,False)
-    env['prj_env'].Append(
-      CPPPATH = c['CPPPATH'],
-      CPPDEFINES = c['CPPDEFINES']+STATIC_DEFINES,
-      CCFLAGS = c['CCFLAGS'] + c.get('CCFLAGSRun', [])
-    )
+    
+    replace_env_with_config(env, c)
     if not runnableOnly:
       AddDependency(env, c['PROG_NAME'], env['SNOCSCRIPT_PATH'])
     
@@ -194,6 +188,22 @@ def DefaultLibraryConfig(env, c):
     env['scons'].Default(PrefixProgram(env, c["SRCPATH"], c['runFiles'], c))
 
   env['SHARED'] = SHARED_VAR_BCP
+
+def replace_env_with_config(env, c):
+  if c.get("CC"):
+    env['prj_env'].Replace(CC = c['CC'])
+  if c.get("TOOLS"):
+    env['prj_env'].Replace(TOOLS = c['TOOLS'])
+  if c.get("CPPPATH"):
+    env['prj_env'].Replace(CPPPATH = c['CPPPATH'])
+  if c.get("CPPDEFINES"):
+    env['prj_env'].Replace(CPPDEFINES = c['CPPDEFINES']+c['STATIC_DEFINES'])
+  if c.get("CCFLAGS"):
+    env['prj_env'].Replace(CCFLAGS = c['CCFLAGS'] + c.get('CCFLAGSTest', []))
+  if c.get("CPPFLAGS"):
+    env['prj_env'].Replace(CPPFLAGS = c['CPPFLAGS'] + c.get('CPPFLAGSTest', []))
+  if c.get("LINKFLAGS"):
+    env['prj_env'].Replace(LINKFLAGS = c['LINKFLAGS'] + c.get('LINKFLAGSTest', []))
 
 def isProjectDisabled(env):
   # print(env['WITHOUT'])
